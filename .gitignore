@@ -1,0 +1,16 @@
+# Directories
+.vs/
+bin/
+bin-int/
+
+# Files
+#*.vcxproj
+#*.vcxproj.user
+#*.vcxproj.filters
+#*.sln
+
+# Exclude
+!vendor/bin
+/st2/imgui.ini
+/st2/st2.vcxproj.user
+/st2/optionen.txt
