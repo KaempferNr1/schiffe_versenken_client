@@ -1,9 +1,11 @@
 #include "Client.h"
+
+#include "Game.h"
 #include "SFML/Network.hpp"
 #include "Utils/json.hpp"
 #include "Utils/Log.h"
 
-Client::Client(sf::IpAddress ip, unsigned short port)
+Client::Client(std::shared_ptr<Game> game, sf::IpAddress ip, unsigned short port): game(game)
 {
 	m_socket = std::make_shared<sf::TcpSocket>();
 	m_socket->setBlocking(true);
@@ -56,6 +58,38 @@ bool Client::is_connected() const
 	return m_connected;
 }
 
+void Client::place_ships(int row, int col, int length, int is_horizontal) const
+{
+	int length_in_row;
+	int length_in_col;
+	if (is_horizontal)
+	{
+		length_in_col = 1;
+		length_in_row = length;
+	}
+	else
+	{
+		length_in_col = length;
+		length_in_row = 1;
+	}
+	std::array<std::array<uint8_t, 10>, 10>& ship_map = game->ship_map;
+	std::vector<Ship>& ships = game->ships;
+	Ship ship;
+	ship.destroyed = false;
+	for (int offset_in_col = 0; offset_in_col < length_in_col; ++offset_in_col)
+	{
+		for (int offset_in_row = 0; offset_in_row < length_in_row; ++offset_in_row)
+		{
+			const int current_row = row + offset_in_row;
+			const int current_col = col + offset_in_col;
+			ship.coordinates.emplace_back(current_row, current_col);
+			ship_map[current_row][current_col] = static_cast<uint8_t>(ships.size()) + 1u;
+		}
+	}
+	ship.segments_left = length;
+	ships.push_back(ship);
+}
+
 void Client::handle_message()
 {
 	sf::SocketSelector selector;
@@ -66,7 +100,7 @@ void Client::handle_message()
 	}
 	sf::Packet packet;
 	sf::Socket::Status status = m_socket->receive(packet);
-	if(status == sf::Socket::Status::Disconnected)
+	if (status == sf::Socket::Status::Disconnected)
 	{
 		LOG_INFO("disconnected");
 		disconnect();
@@ -80,7 +114,7 @@ void Client::handle_message()
 		return;
 	}
 	LOG_INFO("received message");
-	if(packet.getDataSize() == 0)
+	if (packet.getDataSize() == 0)
 	{
 		LOG_WARN("packet contains no data");
 		return;
@@ -89,7 +123,7 @@ void Client::handle_message()
 	packet >> raw;
 	nlohmann::json message = nlohmann::json::parse(raw);
 	std::string type = message["type"];
-	if(type == "ping")
+	if (type == "ping")
 	{
 		LOG_INFO("sending pong");
 		status = send_pong();
@@ -101,10 +135,19 @@ void Client::handle_message()
 			return;
 		}
 	}
-	if(type == "found")
+	if(type == "success")
+	{
+		const int row = message["row"];
+		const int col = message["col"];
+		const int length = message["length"];
+		const int is_horizontal = message["is_horizontal"];
+		place_ships(row, col, length, is_horizontal);
+	}
+	else if(type == "shot")
 	{
 		
 	}
+	LOG_INFO("{}", message.dump());
 }
 
 sf::Socket::Status Client::send_pong()

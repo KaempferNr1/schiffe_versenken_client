@@ -24,6 +24,10 @@ private:
 	std::shared_ptr<Client> m_client;
 	std::shared_ptr<LayerManager> m_layer_manager;
 	std::shared_ptr<Layer> m_current_layer;
+	std::array<std::array<bool, 10>, 10> shots = { false };
+	std::array<std::array<uint8_t, 10>, 10> ship_map = { 0 };
+	std::vector<Ship> ships;
+	friend class Client;
 };
 
 
