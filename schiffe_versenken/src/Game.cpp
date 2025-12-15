@@ -17,6 +17,12 @@
 #include "Utils/json.hpp"
 #include "../Resources/Images/Roboto-Regular.embed"
 
+constexpr sf::Vector2f map_size{342.f,342.f};
+constexpr float padding_between_maps = 20.f;
+constexpr sf::Vector2f cell_size{ 31.f,31.f };
+constexpr sf::Vector2f player_map_offset{50.f,50.f};
+constexpr sf::Vector2f opponent_map_offset{ player_map_offset.x+map_size.x+padding_between_maps,player_map_offset.y};
+
 Game::Game(std::shared_ptr<Soundsystem>& soundsystem)
 {
 	if (!m_font.openFromMemory(g_RobotoRegular, sizeof(g_RobotoRegular)))
@@ -54,11 +60,10 @@ Game::~Game()
 }
 void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, int8_t type, sf::Vector2f offset)
 {
-	constexpr sf::Vector2f cell_size = { 32.f,32.f };
 	const sf::Vector2f cell_position{ (float)col * cell_size.x + offset.x ,(float)row * cell_size.y + offset.y};
 
 
-	constexpr sf::Vector2f single_sprite_size = { 32.f,32.f };
+	constexpr sf::Vector2f single_sprite_size = {32.f,32.f};
 	const sf::Vector2f top_left_tex_coord{(float)type * single_sprite_size.x,0.f};
 	const sf::Vector2f bottom_right_tex_coord = top_left_tex_coord + single_sprite_size;
 
@@ -129,7 +134,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 				const int row = answer["row"];
 				const int col = answer["col"];
 				m_shots[row][col] = answer["kind"] == "miss" ? 1 : 2;
-				add_token_to_vertex_array(m_tokens_vertex_array, row, col, m_shots[row][col] - 1,{100.f + 32.f ,100.f + 32.f});
+				add_token_to_vertex_array(m_tokens_vertex_array, row, col, m_shots[row][col] - 1,{opponent_map_offset + cell_size});
 			}
 			else
 			{
@@ -149,7 +154,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 				{
 					cell = -2;
 				}
-				add_token_to_vertex_array(m_tokens_vertex_array, row, col, cell + 4, { 100.f + 342.f + 50.f + 32.f ,100.f + 32.f });
+				add_token_to_vertex_array(m_tokens_vertex_array, row, col, cell + 4, {player_map_offset + cell_size});
 
 			}
 		}
@@ -324,9 +329,9 @@ void Game::render(sf::RenderWindow& window)
 	if (m_status != status::GAME_DONE && m_status != status::SHOOTING_PHASE && m_status != status::PLACING_PHASE)
 		return;
 	sf::RectangleShape rect;
-	rect.setPosition({ 100.f + 342.f + 50.f,100.f });
+	rect.setPosition(player_map_offset);
 	rect.setTexture(&m_player_background_texture);
-	rect.setSize(sf::Vector2f(m_player_background_texture.getSize()));
+	rect.setSize(map_size);
 	window.draw(rect);
 
 	for (Ship& ship : m_ships)
@@ -336,7 +341,7 @@ void Game::render(sf::RenderWindow& window)
 
 	if (m_status == status::PLACING_PHASE)
 		return;
-	rect.setPosition({ 100.f,100.f });
+	rect.setPosition(opponent_map_offset);
 	rect.setTexture(&m_opponent_background_texture);
 	window.draw(rect);
 
@@ -391,11 +396,11 @@ void Game::place_ships(int row, int col, int length, int is_horizontal)
 
 	if (is_horizontal)
 	{
-		texture_rect.size = { 32 * length,32 };
+		texture_rect.size = { 32 + 31 * (length - 1),32 };
 	}
 	else
 	{
-		texture_rect.size = { 32,32 * length };
+		texture_rect.size = { 32,32 + 31 * (length-1) };
 	}
 	if(length == 2)
 	{
@@ -445,6 +450,6 @@ void Game::place_ships(int row, int col, int length, int is_horizontal)
 
 
 	sprite.setTextureRect(texture_rect);
-	sprite.setPosition({ (float)col * 32.f + 100.f + 342.f + 50.f + 32.f, 100.f + 32.f + (float)row * 32.f });
+	sprite.setPosition({ (float)col * cell_size.x + player_map_offset.x + cell_size.x, +player_map_offset.y + cell_size.y + (float)row * cell_size.y });
 	m_ships.emplace_back(false,length,coordinates,std::move(sprite));
 }
