@@ -105,3 +105,12 @@ private:
 	sf::IpAddress m_ip_address;
 	unsigned short m_port;
 };
+
+class FindMatch : public ButtonBehaviour
+{
+public:
+	FindMatch(const std::shared_ptr<Client>& i_client);
+	[[nodiscard]] bool on_click(std::shared_ptr<LayerManager>& layer_manager, std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window) override;
+private:
+	std::shared_ptr<Client> m_client;
+};

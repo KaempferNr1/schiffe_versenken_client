@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\IdleLayer.h" />
     <ClInclude Include="src\ReconnectScreen.h" />
     <ClInclude Include="src\Client.h" />
     <ClInclude Include="src\Buttons\Button.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="src\Utils\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\IdleLayer.cpp" />
     <ClCompile Include="src\ReconnectScreen.cpp" />
     <ClCompile Include="src\Client.cpp" />
     <ClCompile Include="src\Buttons\Button.cpp" />
@@ -192,6 +194,9 @@
     <ProjectReference Include="..\Vendor\imgui\ImGui.vcxproj">
       <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="server.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

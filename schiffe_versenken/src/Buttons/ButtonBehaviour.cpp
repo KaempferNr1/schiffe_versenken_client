@@ -79,3 +79,18 @@ bool TryConnect::on_click(std::shared_ptr<LayerManager>& layer_manager, std::sha
 	m_client->reconnect(m_ip_address, m_port);
 	return m_client->is_connected();
 }
+
+FindMatch::FindMatch(const std::shared_ptr<Client>& i_client) : m_client(i_client)
+{
+}
+
+bool FindMatch::on_click(std::shared_ptr<LayerManager>& layer_manager, std::shared_ptr<Soundsystem>& soundsystem,
+	sf::RenderWindow& window)
+{
+	nlohmann::json message;
+	message["type"] = "find";
+	sf::Packet packet;
+	packet << message.dump();
+	m_client->m_packets_to_be_sent.push_back(packet);
+	return true;
+}

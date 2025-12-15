@@ -1,25 +1,25 @@
-#include "ReconnectScreen.h"
+#include "IdleLayer.h"
 
-#include <SFML/Network/IpAddress.hpp>
+#include <SFML/Network.hpp>
 
 #include "Eventsystem.h"
 #include "Utils/Soundsystem.h"
 #include "LayerManager.h"
 #include "Buttons/Button.h"
 
-ReconnectScreen::ReconnectScreen(std::shared_ptr<Client> client, sf::IpAddress ip, unsigned short port)
+IdleLayer::IdleLayer(std::shared_ptr<Client> client)
 {
 	m_buttons.emplace_back(std::make_shared<Button>());
 	m_buttons.emplace_back(std::make_shared<Button>());
 
-	m_buttons[0]->set_layout(std::make_shared<TextLayout>("verbinden", sf::Vector2f{ 260.f,145.f }, sf::Vector2f{ 400.f,100.f }));
-	m_buttons[0]->set_behaviour(std::make_shared<TryConnect>(client,ip, port));
+	m_buttons[0]->set_layout(std::make_shared<TextLayout>("match suchen", sf::Vector2f{ 260.f,145.f }, sf::Vector2f{ 400.f,100.f }));
+	m_buttons[0]->set_behaviour(std::make_shared<FindMatch>(client));
 
 	m_buttons[1]->set_layout(std::make_shared<TextLayout>("schließen", sf::Vector2f{ 260.f,285.f }, sf::Vector2f{ 400.f,100.f }));
 	m_buttons[1]->set_behaviour(std::make_shared<PopLayer>());
 }
-void ReconnectScreen::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<LayerManager>& layer_manager,
-                              std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window, double deltatime)
+void IdleLayer::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<LayerManager>& layer_manager,
+	std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window, double deltatime)
 {
 	const sf::Vector2f mouse_pos = eventsystem->get_mouse_position();
 
@@ -66,7 +66,7 @@ void ReconnectScreen::update(std::shared_ptr<Eventsystem>& eventsystem, std::sha
 	}
 }
 
-void ReconnectScreen::render(sf::RenderWindow& window)
+void IdleLayer::render(sf::RenderWindow& window)
 {
 	for (const auto& button : m_buttons)
 	{
@@ -74,12 +74,13 @@ void ReconnectScreen::render(sf::RenderWindow& window)
 	}
 }
 
-void ReconnectScreen::on_close()
+void IdleLayer::on_close()
 {
 
 }
 
-LayerID ReconnectScreen::get_layer_id()
+LayerID IdleLayer::get_layer_id()
 {
-	return LayerID::reconnect_screen;
+	return LayerID::idle_layer;
 }
+

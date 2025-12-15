@@ -15,6 +15,7 @@ enum class LayerID
     options,
 	reconnect_screen,
 
+    idle_layer,
 };
 
 

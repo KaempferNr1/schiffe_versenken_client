@@ -6,6 +6,7 @@
 
 #include "SFML/Network/Socket.hpp"
 #include "SFML/Network/TcpSocket.hpp"
+#include "Utils/json.hpp"
 
 class Game;
 
@@ -27,14 +28,14 @@ public:
     std::shared_ptr<Game> game;
 
     Client(std::shared_ptr<Game> game, sf::IpAddress ip, unsigned short port);
-    void update();
+    std::optional<nlohmann::json>  update();
     void reconnect(sf::IpAddress ip, unsigned short port);
     void connect(sf::IpAddress ip, unsigned short port);
     void disconnect();
     bool is_connected() const;
 
     void place_ships(int row, int col, int length, int is_horizontal) const;
-    void handle_message();
+    std::optional<nlohmann::json> handle_message();
 
     sf::Socket::Status send_pong();
 

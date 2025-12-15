@@ -8,20 +8,20 @@ std::shared_ptr<Layer>& LayerManager::get_top()
 		throw std::runtime_error("Layer stack is empty, cannot get top layer.");
 	}
 #endif
-	return m_layers.top();
+	return m_layers.back();
 }
 
 void LayerManager::push_layer(const std::shared_ptr<Layer>& layer)
 {
-	m_layers.push(layer);
+	m_layers.push_back(layer);
 }
 
 void LayerManager::pop_layer()
 {
 	if (!m_layers.empty()) 
 	{
-		m_layers.top()->on_close();
-		m_layers.pop();
+		m_layers.back()->on_close();
+		m_layers.pop_back();
 	}
 }
 
@@ -34,7 +34,7 @@ void LayerManager::close_till_layer(const LayerID target_layer_id)
 {
 	while (!m_layers.empty())
 	{
-		Layer* top_layer = m_layers.top().get();
+		Layer* top_layer = m_layers.back().get();
 
 		if (top_layer->get_layer_id() == target_layer_id)
 		{
@@ -42,6 +42,6 @@ void LayerManager::close_till_layer(const LayerID target_layer_id)
 		}
 
 		top_layer->on_close();
-		m_layers.pop();
+		m_layers.pop_back();
 	}
 }

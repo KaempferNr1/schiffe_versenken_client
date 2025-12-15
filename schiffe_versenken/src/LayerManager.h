@@ -18,7 +18,9 @@ public:
 	[[nodiscard]] bool is_empty() const;
 
 	void close_till_layer(LayerID target_layer_id);
+	void clear() { m_layers.clear(); }
+
 private:
-	std::stack<std::shared_ptr<Layer>> m_layers;
+	std::deque<std::shared_ptr<Layer>> m_layers;
 };
 

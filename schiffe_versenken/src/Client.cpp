@@ -17,11 +17,14 @@ Client::Client(std::shared_ptr<Game> game, sf::IpAddress ip, unsigned short port
 	m_socket->setBlocking(false);
 }
 
-void Client::update()
+std::optional<nlohmann::json> Client::update()
 {
+	if (!m_connected)
+		return std::nullopt;
+
 	handle_partial_sends();
 	handle_not_sended();
-	handle_message();
+	return handle_message();
 }
 
 void Client::reconnect(sf::IpAddress ip, unsigned short port)
@@ -60,25 +63,25 @@ bool Client::is_connected() const
 
 void Client::place_ships(int row, int col, int length, int is_horizontal) const
 {
-	int length_in_row;
-	int length_in_col;
+	int amount_of_rows;
+	int amount_of_cols;
 	if (is_horizontal)
 	{
-		length_in_col = 1;
-		length_in_row = length;
+		amount_of_cols = length;
+		amount_of_rows = 1;
 	}
 	else
 	{
-		length_in_col = length;
-		length_in_row = 1;
+		amount_of_cols = 1;
+		amount_of_rows = length;
 	}
-	std::array<std::array<uint8_t, 10>, 10>& ship_map = game->ship_map;
-	std::vector<Ship>& ships = game->ships;
+	std::array<std::array<int8_t, 10>, 10>& ship_map = game->m_ship_map;
+	std::vector<Ship>& ships = game->m_ships;
 	Ship ship;
 	ship.destroyed = false;
-	for (int offset_in_col = 0; offset_in_col < length_in_col; ++offset_in_col)
+	for (int offset_in_col = 0; offset_in_col < amount_of_cols; ++offset_in_col)
 	{
-		for (int offset_in_row = 0; offset_in_row < length_in_row; ++offset_in_row)
+		for (int offset_in_row = 0; offset_in_row < amount_of_rows; ++offset_in_row)
 		{
 			const int current_row = row + offset_in_row;
 			const int current_col = col + offset_in_col;
@@ -90,50 +93,52 @@ void Client::place_ships(int row, int col, int length, int is_horizontal) const
 	ships.push_back(ship);
 }
 
-void Client::handle_message()
+std::optional<nlohmann::json> Client::handle_message()
 {
 	sf::SocketSelector selector;
 	selector.add(*m_socket);
 	if (!selector.wait(sf::microseconds(10)))
 	{
-		return;
+		return std::nullopt;
 	}
 	sf::Packet packet;
 	sf::Socket::Status status = m_socket->receive(packet);
 	if (status == sf::Socket::Status::Disconnected)
 	{
 		LOG_INFO("disconnected");
+		
 		disconnect();
 		m_packets_to_be_sent.clear();
 		m_packet_to_be_resent.clear();
-		return;
+		return std::nullopt;
 	}
 	if (status != sf::Socket::Status::Done)
 	{
 		LOG_INFO("message error or something");
-		return;
+		return std::nullopt;
 	}
-	LOG_INFO("received message");
 	if (packet.getDataSize() == 0)
 	{
 		LOG_WARN("packet contains no data");
-		return;
+		return std::nullopt;
 	}
+
 	std::string raw;
 	packet >> raw;
 	nlohmann::json message = nlohmann::json::parse(raw);
 	std::string type = message["type"];
 	if (type == "ping")
 	{
-		LOG_INFO("sending pong");
+		//LOG_INFO("sending pong");
 		status = send_pong();
 		if (status == sf::Socket::Status::Disconnected)
 		{
 			m_packet_to_be_resent.clear();
 			m_packets_to_be_sent.clear();
 			disconnect();
-			return;
+			return std::nullopt;
 		}
+		return std::nullopt;
 	}
 	if(type == "success")
 	{
@@ -145,9 +150,35 @@ void Client::handle_message()
 	}
 	else if(type == "shot")
 	{
-		
+
+		if (message["kind"] != "receive") 
+		{
+			const int row = message["row"];
+			const int col = message["col"];
+			game->m_shots[row][col] = message["kind"] == "miss" ? 1 : 2;
+		}
+		else
+		{
+			const int row = message["row"];
+			const int col = message["col"];
+			const uint8_t cell = game->m_ship_map[row][col];
+
+			if (cell > 0)
+			{
+				game->m_ship_map[row][col] = -1;
+				if(--game->m_ships[cell - 1].segments_left == 0)
+				{
+					game->m_ships[cell - 1].destroyed = true;
+				}
+			}
+			else
+			{
+				game->m_ship_map[row][col] = -2;
+			}
+		}
 	}
 	LOG_INFO("{}", message.dump());
+	return message;
 }
 
 sf::Socket::Status Client::send_pong()
@@ -171,10 +202,6 @@ sf::Socket::Status Client::send_message(const std::string& message)
 	{
 		LOG_INFO("partial send");
 		m_packet_to_be_resent = std::move(packet);
-	}
-	if(status == sf::Socket::Status::Done)
-	{
-		LOG_INFO("send message");
 	}
 
 	return status;
