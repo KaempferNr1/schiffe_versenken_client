@@ -5,7 +5,12 @@
 #include "Utils/json.hpp"
 #include "Utils/Log.h"
 
-Client::Client(std::shared_ptr<Game> game, sf::IpAddress ip, unsigned short port): game(game)
+void Ship::render(sf::RenderWindow& window)
+{
+	window.draw(sprite);
+}
+
+Client::Client(sf::IpAddress ip, unsigned short port)
 {
 	m_socket = std::make_shared<sf::TcpSocket>();
 	m_socket->setBlocking(true);
@@ -61,38 +66,6 @@ bool Client::is_connected() const
 	return m_connected;
 }
 
-void Client::place_ships(int row, int col, int length, int is_horizontal) const
-{
-	int amount_of_rows;
-	int amount_of_cols;
-	if (is_horizontal)
-	{
-		amount_of_cols = length;
-		amount_of_rows = 1;
-	}
-	else
-	{
-		amount_of_cols = 1;
-		amount_of_rows = length;
-	}
-	std::array<std::array<int8_t, 10>, 10>& ship_map = game->m_ship_map;
-	std::vector<Ship>& ships = game->m_ships;
-	Ship ship;
-	ship.destroyed = false;
-	for (int offset_in_col = 0; offset_in_col < amount_of_cols; ++offset_in_col)
-	{
-		for (int offset_in_row = 0; offset_in_row < amount_of_rows; ++offset_in_row)
-		{
-			const int current_row = row + offset_in_row;
-			const int current_col = col + offset_in_col;
-			ship.coordinates.emplace_back(current_row, current_col);
-			ship_map[current_row][current_col] = static_cast<uint8_t>(ships.size()) + 1u;
-		}
-	}
-	ship.segments_left = length;
-	ships.push_back(ship);
-}
-
 std::optional<nlohmann::json> Client::handle_message()
 {
 	sf::SocketSelector selector;
@@ -126,7 +99,7 @@ std::optional<nlohmann::json> Client::handle_message()
 	std::string raw;
 	packet >> raw;
 	nlohmann::json message = nlohmann::json::parse(raw);
-	std::string type = message["type"];
+	const std::string type = message["type"];
 	if (type == "ping")
 	{
 		//LOG_INFO("sending pong");
@@ -140,43 +113,7 @@ std::optional<nlohmann::json> Client::handle_message()
 		}
 		return std::nullopt;
 	}
-	if(type == "success")
-	{
-		const int row = message["row"];
-		const int col = message["col"];
-		const int length = message["length"];
-		const int is_horizontal = message["is_horizontal"];
-		place_ships(row, col, length, is_horizontal);
-	}
-	else if(type == "shot")
-	{
 
-		if (message["kind"] != "receive") 
-		{
-			const int row = message["row"];
-			const int col = message["col"];
-			game->m_shots[row][col] = message["kind"] == "miss" ? 1 : 2;
-		}
-		else
-		{
-			const int row = message["row"];
-			const int col = message["col"];
-			const uint8_t cell = game->m_ship_map[row][col];
-
-			if (cell > 0)
-			{
-				game->m_ship_map[row][col] = -1;
-				if(--game->m_ships[cell - 1].segments_left == 0)
-				{
-					game->m_ships[cell - 1].destroyed = true;
-				}
-			}
-			else
-			{
-				game->m_ship_map[row][col] = -2;
-			}
-		}
-	}
 	LOG_INFO("{}", message.dump());
 	return message;
 }

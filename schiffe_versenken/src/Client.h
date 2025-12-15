@@ -2,6 +2,8 @@
 #include <deque>
 #include <memory>
 #include <unordered_map>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Network/Packet.hpp>
 
 #include "SFML/Network/Socket.hpp"
@@ -12,9 +14,11 @@ class Game;
 
 struct Ship
 {
-    bool destroyed;
-    int segments_left;
+    bool destroyed{ false };
+    int segments_left{1};
     std::vector<std::pair<int, int>> coordinates;
+    sf::Sprite sprite;
+    void render(sf::RenderWindow&);
 };
 
 
@@ -25,17 +29,14 @@ public:
     std::shared_ptr<sf::TcpSocket> m_socket;
     sf::Packet m_packet_to_be_resent;
     std::deque<sf::Packet> m_packets_to_be_sent;
-    std::shared_ptr<Game> game;
 
-    Client(std::shared_ptr<Game> game, sf::IpAddress ip, unsigned short port);
+    Client(sf::IpAddress ip, unsigned short port);
     std::optional<nlohmann::json>  update();
     void reconnect(sf::IpAddress ip, unsigned short port);
     void connect(sf::IpAddress ip, unsigned short port);
     void disconnect();
     bool is_connected() const;
-
-    void place_ships(int row, int col, int length, int is_horizontal) const;
-    std::optional<nlohmann::json> handle_message();
+	std::optional<nlohmann::json> handle_message();
 
     sf::Socket::Status send_pong();
 

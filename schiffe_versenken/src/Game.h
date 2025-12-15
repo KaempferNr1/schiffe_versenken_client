@@ -31,6 +31,8 @@ public:
 	void on_close() override;
 
 	[[nodiscard]] LayerID get_layer_id() override;
+	void place_ships(int row, int col, int length, int is_horizontal);
+
 private:
 	sf::View m_view;
 	sf::Font m_font;
@@ -43,6 +45,12 @@ private:
 	std::vector<Ship> m_ships;
 	status m_status = status::IDLE;
 	nlohmann::json m_server_info;
+	sf::Texture m_player_background_texture;
+	sf::Texture m_opponent_background_texture;
+	sf::Texture m_tokens_texture;
+	sf::Texture m_ship_texture;
+
+	sf::VertexArray m_tokens_vertex_array;
 
 	friend class Client;
 };
