@@ -14,10 +14,11 @@ class Game;
 
 struct Ship
 {
-    bool destroyed{ false };
-    int segments_left{1};
     std::vector<std::pair<int, int>> coordinates;
     sf::Sprite sprite;
+    int segments_left{ 1 };
+    bool destroyed{ false };
+
     void render(sf::RenderWindow&);
 };
 
@@ -25,18 +26,18 @@ struct Ship
 class Client
 {
 public:
-    bool m_connected = false;
     std::shared_ptr<sf::TcpSocket> m_socket;
     sf::Packet m_packet_to_be_resent;
     std::deque<sf::Packet> m_packets_to_be_sent;
+    bool m_connected = false;
 
     Client(sf::IpAddress ip, unsigned short port);
-    std::optional<nlohmann::json>  update();
+    nlohmann::json update();
     void reconnect(sf::IpAddress ip, unsigned short port);
     void connect(sf::IpAddress ip, unsigned short port);
     void disconnect();
     bool is_connected() const;
-	std::optional<nlohmann::json> handle_message();
+	nlohmann::json handle_message();
 
     sf::Socket::Status send_pong();
 

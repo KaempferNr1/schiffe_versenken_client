@@ -3,7 +3,7 @@
 #include <fstream>
 #include <glm/glm.hpp>
 
-#include "Buttons/Button.h"
+#include "UI/Button.h"
 #include "Eventsystem.h"
 #include "imgui.h"
 #include "LayerManager.h"
@@ -44,7 +44,6 @@ Game::Game(std::shared_ptr<Soundsystem>& soundsystem)
 	m_layer_manager = std::make_shared<LayerManager>();
 	std::ifstream f("server.json");
 	m_server_info = nlohmann::json::parse(f);
-	const float scalar = 1;
 	if (!m_player_background_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "oceangrid_final.png"))LOG_ERROR("Failed to load");
 	if (!m_opponent_background_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "radargrid_final.png"))LOG_ERROR("Failed to load");
 	if (!m_tokens_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "Tokens.png"))LOG_ERROR("Failed to load");
@@ -68,10 +67,13 @@ void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, 
 	const sf::Vector2f bottom_right_tex_coord = top_left_tex_coord + single_sprite_size;
 
 
-	const sf::Vertex vertex1 = { cell_position,{sf::Color::White},{top_left_tex_coord} };
-	const sf::Vertex vertex2 = { { cell_position.x + cell_size.x,cell_position.y },{sf::Color::White},{ bottom_right_tex_coord.x,top_left_tex_coord.y} };
-	const sf::Vertex vertex3 = { { cell_position.x,cell_position.y + cell_size.y },{sf::Color::White},{ top_left_tex_coord.x,bottom_right_tex_coord.y } };
-	const sf::Vertex vertex4 = { cell_position + cell_size,{sf::Color::White},{bottom_right_tex_coord} };
+	const sf::Vertex vertex1 = {.position = cell_position, .color = {sf::Color::White}, .texCoords = {top_left_tex_coord} };
+	const sf::Vertex vertex2 = {.position = { cell_position.x + single_sprite_size.x,cell_position.y }, .color = {sf::Color::White},
+		.texCoords = { bottom_right_tex_coord.x,top_left_tex_coord.y} };
+	const sf::Vertex vertex3 = {.position = { cell_position.x,cell_position.y + single_sprite_size.y }, .color = {sf::Color::White},
+		.texCoords = { top_left_tex_coord.x,bottom_right_tex_coord.y } };
+	const sf::Vertex vertex4 = {.position = cell_position + single_sprite_size, .color = {sf::Color::White},
+		.texCoords = {bottom_right_tex_coord} };
 
 
 	vertex_array.append(vertex1);
@@ -94,11 +96,10 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 		m_status = m_client->is_connected() ? status::IDLE : status::NO_CONNECTION;
 		LOG_INFO("client connected: {}", m_client->is_connected());
 	}
-	std::optional<nlohmann::json> answer_optional = m_client->update();
+	nlohmann::json answer = m_client->update();
 
-	if (answer_optional.has_value())
+	if (!answer.empty())
 	{
-		nlohmann::json answer = answer_optional.value();
 		const std::string type = answer["type"];
 		if (type == "matchmaking started")
 		{
@@ -222,7 +223,8 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 	}
 	else if (m_status == status::FINDING_GAME)
 	{
-		m_layer_manager->clear();
+		if(!m_layer_manager->is_empty())
+			m_layer_manager->clear();
 	}
 	else if (m_status == status::GAME_DONE)
 	{
@@ -253,11 +255,11 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			packet << message.dump();
 			m_client->m_packets_to_be_sent.push_back(packet);
 		}
-		ImGui::Text("Ship board");
-		for (int i = 0; i < 10; ++i)
-		{
-			ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_ship_map[i][0], m_ship_map[i][1], m_ship_map[i][2], m_ship_map[i][3], m_ship_map[i][4], m_ship_map[i][5], m_ship_map[i][6], m_ship_map[i][7], m_ship_map[i][8], m_ship_map[i][9]);
-		}
+		//ImGui::Text("Ship board");
+		//for (int i = 0; i < 10; ++i)
+		//{
+		//	ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_ship_map[i][0], m_ship_map[i][1], m_ship_map[i][2], m_ship_map[i][3], m_ship_map[i][4], m_ship_map[i][5], m_ship_map[i][6], m_ship_map[i][7], m_ship_map[i][8], m_ship_map[i][9]);
+		//}
 		ImGui::End();
 	}
 	else
@@ -279,17 +281,17 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			packet << message.dump();
 			m_client->m_packets_to_be_sent.push_back(packet);
 		}
-		ImGui::Text("Ship board");
-		for (int i = 0; i < 10; ++i)
-		{
-			ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_ship_map[i][0], m_ship_map[i][1], m_ship_map[i][2], m_ship_map[i][3], m_ship_map[i][4], m_ship_map[i][5], m_ship_map[i][6], m_ship_map[i][7], m_ship_map[i][8], m_ship_map[i][9]);
-		}
+		//ImGui::Text("Ship board");
+		//for (int i = 0; i < 10; ++i)
+		//{
+		//	ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_ship_map[i][0], m_ship_map[i][1], m_ship_map[i][2], m_ship_map[i][3], m_ship_map[i][4], m_ship_map[i][5], m_ship_map[i][6], m_ship_map[i][7], m_ship_map[i][8], m_ship_map[i][9]);
+		//}
 
-		ImGui::Text("hit board");
-		for (int i = 0; i < 10; ++i)
-		{
-			ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_shots[i][0], m_shots[i][1], m_shots[i][2], m_shots[i][3], m_shots[i][4], m_shots[i][5], m_shots[i][6], m_shots[i][7], m_shots[i][8], m_shots[i][9]);
-		}
+		//ImGui::Text("hit board");
+		//for (int i = 0; i < 10; ++i)
+		//{
+		//	ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_shots[i][0], m_shots[i][1], m_shots[i][2], m_shots[i][3], m_shots[i][4], m_shots[i][5], m_shots[i][6], m_shots[i][7], m_shots[i][8], m_shots[i][9]);
+		//}
 
 		ImGui::End();
 
@@ -328,6 +330,7 @@ void Game::render(sf::RenderWindow& window)
 
 	if (m_status != status::GAME_DONE && m_status != status::SHOOTING_PHASE && m_status != status::PLACING_PHASE)
 		return;
+
 	sf::RectangleShape rect;
 	rect.setPosition(player_map_offset);
 	rect.setTexture(&m_player_background_texture);
@@ -348,9 +351,6 @@ void Game::render(sf::RenderWindow& window)
 	sf::RenderStates states = sf::RenderStates::Default;
 	states.texture = &m_tokens_texture;
 	window.draw(m_tokens_vertex_array, states);
-	
-
-
 }
 
 void Game::on_close()
@@ -451,5 +451,8 @@ void Game::place_ships(int row, int col, int length, int is_horizontal)
 
 	sprite.setTextureRect(texture_rect);
 	sprite.setPosition({ (float)col * cell_size.x + player_map_offset.x + cell_size.x, +player_map_offset.y + cell_size.y + (float)row * cell_size.y });
-	m_ships.emplace_back(false,length,coordinates,std::move(sprite));
+	m_ships.emplace_back(coordinates, std::move(sprite), length, false);
+
+
+
 }

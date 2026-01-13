@@ -16,6 +16,7 @@
 #include "Eventsystem.h"
 #include "Layer.h"
 #include "LayerManager.h"
+#include "UI/Button.h"
 #include "Menu.h"
 
 static int Main(int argc, char** argv);
@@ -28,7 +29,7 @@ static [[nodiscard]] std::shared_ptr<LayerManager> init_layer_manager();
 
 static [[nodiscard]] std::shared_ptr<Soundsystem> init_soundsystem();
 
-static void save_volumes(std::shared_ptr<Soundsystem> soundsystem);
+static void save_volumes(const std::shared_ptr<Soundsystem>& soundsystem);
 
 
 #if (defined(PLATFORM_WINDOWS) || defined (_WIN64)) && defined(DIST)
@@ -70,14 +71,30 @@ int Main([[maybe_unused]] const int argc, [[maybe_unused]] char** argv)
     std::shared_ptr<LayerManager> layer_manager = init_layer_manager();
 
 
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(0);
     sf::Clock delta_clock;
+    double current_fps = 0;
+    int current_frames = 0;
+    double condt = 0;
 	while (window.isOpen())
     {
+        current_frames++;
         eventsystem->handle_updates(window);
 		const double deltatime = static_cast<double>(delta_clock.getElapsedTime().asSeconds());
 		ImGui::SFML::Update(window, delta_clock.restart());
+        condt += deltatime;
 
+        ImGui::Begin("debug");
+        if (condt > 1)
+        {
+            current_fps = static_cast<double>(current_frames) / condt;
+            condt = 0;
+            current_frames = 0;
+        }
+
+		ImGui::Text("fps: %.2f", current_fps);
+
+		ImGui::End();
     	const std::shared_ptr<Layer> current_layer = layer_manager->get_top();
 		current_layer->update(eventsystem,layer_manager,soundsystem,window,deltatime);
 
@@ -178,13 +195,24 @@ std::shared_ptr<Soundsystem> init_soundsystem()
     auto soundsystem = std::make_shared<Soundsystem>(0.f, false);
     //TODO: ADD ADITIONAL SOUNDS
     soundsystem->add_group("ui_sounds");
-    soundsystem->add_group("player_sounds");
+    soundsystem->add_group("game_sounds");
 
-    soundsystem->set_should_play_music(true);
+    const std::filesystem::path music_sounds{ std::filesystem::path("Resources") / "Sounds" / "Music" };
+    std::vector<int> music_indices;
+    for (auto const& dir_entry : std::filesystem::directory_iterator{ music_sounds })
+    {
+        LOG_INFO("{}", dir_entry.path().string());
+        music_indices.emplace_back(static_cast<int>(music_indices.size()));
+        soundsystem->load_buffer(dir_entry.path().string(), false, "music");
+    }
+    soundsystem->set_music_indices(music_indices);
+    soundsystem->set_should_play_music(!music_indices.empty());
+
 
     std::ifstream fin("optionen.txt");
     std::unordered_map volumes = soundsystem->get_volumes();
-    if (fin.is_open())
+    
+	if (fin.is_open())
     {
 	    while (!fin.eof())
 	    {
@@ -202,6 +230,7 @@ std::shared_ptr<Soundsystem> init_soundsystem()
 		    }
 		    catch (...)
 		    {
+                continue;
 		    }
 
 
@@ -217,7 +246,7 @@ std::shared_ptr<Soundsystem> init_soundsystem()
     return soundsystem;
 }
 
-void save_volumes(std::shared_ptr<Soundsystem> soundsystem)
+void save_volumes(const std::shared_ptr<Soundsystem>& soundsystem)
 {
     std::unordered_map volumes = soundsystem->get_volumes();
     std::ofstream fout("optionen.txt");
@@ -227,7 +256,7 @@ void save_volumes(std::shared_ptr<Soundsystem> soundsystem)
         return;
     }
 
-    for (auto [group,volume] : volumes)
+    for (const auto& [group,volume] : volumes)
     {
         fout << group << ';' << volume << '\n';
     }

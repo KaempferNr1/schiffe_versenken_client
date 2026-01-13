@@ -40,17 +40,21 @@ private:
 	std::shared_ptr<LayerManager> m_layer_manager;
 	std::shared_ptr<Layer> m_current_layer;
 
-	std::array<std::array<int8_t, 10>, 10> m_shots = {{false}};
-	std::array<std::array<int8_t, 10>, 10> m_ship_map = {{0}};
 	std::vector<Ship> m_ships;
-	status m_status = status::IDLE;
 	nlohmann::json m_server_info;
+
 	sf::Texture m_player_background_texture;
 	sf::Texture m_opponent_background_texture;
 	sf::Texture m_tokens_texture;
 	sf::Texture m_ship_texture;
 
 	sf::VertexArray m_tokens_vertex_array;
+
+	status m_status = status::IDLE;
+	std::array<std::array<int8_t, 10>, 10> m_shots = { {0} };
+	std::array<std::array<int8_t, 10>, 10> m_ship_map = { {0} };
+
+
 
 	friend class Client;
 };

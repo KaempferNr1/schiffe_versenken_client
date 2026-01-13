@@ -28,8 +28,8 @@ public:
 
 	[[nodiscard]] LayerID get_layer_id() override;
 private:
-	int m_selected = -1;
 	std::shared_ptr<Client> m_client;
-	std::vector<std::shared_ptr<Button>> m_buttons;
+	std::vector<std::unique_ptr<Button>> m_buttons;
+	int m_selected = -1;
 };
 

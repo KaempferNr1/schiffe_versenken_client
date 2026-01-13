@@ -22,10 +22,10 @@ Client::Client(sf::IpAddress ip, unsigned short port)
 	m_socket->setBlocking(false);
 }
 
-std::optional<nlohmann::json> Client::update()
+nlohmann::json Client::update()
 {
 	if (!m_connected)
-		return std::nullopt;
+		return {};
 
 	handle_partial_sends();
 	handle_not_sended();
@@ -66,14 +66,14 @@ bool Client::is_connected() const
 	return m_connected;
 }
 
-std::optional<nlohmann::json> Client::handle_message()
+nlohmann::json Client::handle_message()
 {
-	sf::SocketSelector selector;
-	selector.add(*m_socket);
-	if (!selector.wait(sf::microseconds(10)))
-	{
-		return std::nullopt;
-	}
+	//sf::SocketSelector selector;
+	//selector.add(*m_socket);
+	//if (!selector.wait(sf::microseconds(1)))
+	//{
+	//	return {};
+	//}
 	sf::Packet packet;
 	sf::Socket::Status status = m_socket->receive(packet);
 	if (status == sf::Socket::Status::Disconnected)
@@ -83,17 +83,21 @@ std::optional<nlohmann::json> Client::handle_message()
 		disconnect();
 		m_packets_to_be_sent.clear();
 		m_packet_to_be_resent.clear();
-		return std::nullopt;
+		return {};
+	}
+	if(status == sf::Socket::Status::NotReady)
+	{
+		return {};
 	}
 	if (status != sf::Socket::Status::Done)
 	{
 		LOG_INFO("message error or something");
-		return std::nullopt;
+		return {};
 	}
 	if (packet.getDataSize() == 0)
 	{
 		LOG_WARN("packet contains no data");
-		return std::nullopt;
+		return {};
 	}
 
 	std::string raw;
@@ -109,9 +113,9 @@ std::optional<nlohmann::json> Client::handle_message()
 			m_packet_to_be_resent.clear();
 			m_packets_to_be_sent.clear();
 			disconnect();
-			return std::nullopt;
+			return {};
 		}
-		return std::nullopt;
+		return {};
 	}
 
 	LOG_INFO("{}", message.dump());

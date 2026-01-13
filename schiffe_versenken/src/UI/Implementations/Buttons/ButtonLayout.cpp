@@ -1,16 +1,17 @@
 #include "ButtonLayout.h"
 
-#include "../../Resources/Images/Roboto-Regular.embed"
+#include "../Resources/Images/Roboto-Regular.embed"
+#include "UI/Button.h"
 
 TextLayout::TextLayout(const std::string& i_text,
-    const sf::Vector2f& i_position,
-    const sf::Vector2f& i_size,
-    const float i_outline_thickness,
-    const sf::Color& i_default_color,
-    const sf::Color& i_hovered_color,
-    const sf::Color& i_pressed_color,
-    const sf::Color& i_outline_color
-     ):m_font(g_RobotoRegular, sizeof g_RobotoRegular),m_text(m_font,i_text, 24)
+                       const sf::Vector2f& i_position,
+                       const sf::Vector2f& i_size,
+                       const float i_outline_thickness,
+                       const sf::Color& i_default_color,
+                       const sf::Color& i_hovered_color,
+                       const sf::Color& i_pressed_color,
+                       const sf::Color& i_outline_color
+) : m_font(g_RobotoRegular, sizeof g_RobotoRegular),m_text(m_font,i_text, 24)
 {
 
     m_default_color = i_default_color;
@@ -54,6 +55,11 @@ void TextLayout::set_position(const sf::Vector2f& position)
     m_text.setPosition({ std::floor(adjusted_x), std::floor(adjusted_y) });
 }
 
+sf::Vector2f TextLayout::get_position()
+{
+    return m_shape.getPosition();
+}
+
 void TextLayout::render(sf::RenderWindow& window)
 {
     window.draw(m_shape);
@@ -65,8 +71,11 @@ bool TextLayout::is_hovered()
     return m_hovered;
 }
 
-void TextLayout::update(const sf::Vector2f& mouse_position,const bool mouse_pressed)
+void TextLayout::update(const std::shared_ptr<Eventsystem>& eventsystem)
 {
+    const sf::Vector2f mouse_position = eventsystem->get_mouse_position();
+    const bool mouse_pressed = eventsystem->get_mouse_button_action(sf::Mouse::Button::Left) == Eventsystem::action_released;
+
     m_hovered = m_shape.getGlobalBounds().contains(mouse_position);
     m_clicked = false;
 
@@ -99,7 +108,7 @@ void TextLayout::set_is_hovered(const bool hovered)
     m_shape.setFillColor(hovered ? m_hovered_color : m_default_color);
 }
 
-void TextLayout::set_text(const std::string& i_text)
+void TextLayout::set_data(const std::string& i_text)
 {
     m_text.setString(i_text);
     set_position(m_shape.getPosition());
@@ -158,6 +167,11 @@ void TextImageLayout::set_position(const sf::Vector2f& position)
     m_text.setPosition({ std::floor(adjusted_x), std::floor(adjusted_y) });
 }
 
+sf::Vector2f TextImageLayout::get_position()
+{
+    return m_shape.getPosition();
+}
+
 void TextImageLayout::render(sf::RenderWindow& window)
 {
     window.draw(m_shape);
@@ -169,8 +183,10 @@ bool TextImageLayout::is_hovered()
     return m_hovered;
 }
 
-void TextImageLayout::update(const sf::Vector2f& mouse_position,const bool mouse_pressed)
+void TextImageLayout::update(const std::shared_ptr<Eventsystem>& eventsystem)
 {
+    const sf::Vector2f mouse_position = eventsystem->get_mouse_position();
+    const bool mouse_pressed = eventsystem->get_mouse_button_action(sf::Mouse::Button::Left) == Eventsystem::action_released;
     m_hovered = m_shape.getGlobalBounds().contains(mouse_position);
     m_clicked = false;
 
@@ -203,8 +219,56 @@ void TextImageLayout::set_is_hovered(const bool hovered)
     m_shape.setTexture(hovered ? m_hovered_texture : m_default_texture);
 }
 
-void TextImageLayout::set_text(const std::string& i_text)
+void TextImageLayout::set_data(const std::string& i_text)
 {
     m_text.setString(i_text);
     set_position(m_shape.getPosition());
 }
+
+FloatSliderLayout::FloatSliderLayout(const std::shared_ptr<Slider<float>>& i_slider): m_slider(i_slider)
+{
+}
+
+
+
+void FloatSliderLayout::update(const std::shared_ptr<Eventsystem>& eventsystem)
+{
+    m_slider->update(eventsystem);
+}
+
+void FloatSliderLayout::set_position(const sf::Vector2f& position)
+{
+    m_slider->set_position(position);
+}
+
+sf::Vector2f FloatSliderLayout::get_position()
+{
+    return m_slider->get_position();
+}
+
+bool FloatSliderLayout::is_hovered()
+{
+    return m_hovered;
+}
+
+bool FloatSliderLayout::is_clicked()
+{
+    return m_slider->is_clicked();
+}
+
+void FloatSliderLayout::set_is_hovered(bool hovered)
+{
+    m_hovered = hovered;
+}
+
+void FloatSliderLayout::render(sf::RenderWindow& window)
+{
+    m_slider->render(window);
+}
+
+void FloatSliderLayout::set_data([[maybe_unused]] const std::string& i_text)
+{
+
+}
+
+

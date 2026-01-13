@@ -1,12 +1,17 @@
 #pragma once
 #include <memory>
 
-#include "ButtonBehaviour.h"
-#include "ButtonLayout.h"
+#include "Implementations/Buttons/ButtonLayout.h"
+#include "Implementations/Buttons/ButtonBehaviour.h"
+#include "Eventsystem.h"
 
 class Button
 {
 public:
+	static constexpr sf::Vector2f large_button_size = { 400.f, 100.f };
+	static constexpr sf::Vector2f medium_button_size = { 200.f, 50.f };
+	static constexpr sf::Vector2f small_button_size = { 50.f,50.f };
+
 	Button()
 		: m_layout(std::make_shared<EmptyLayout>()), m_button_behaviour(std::make_shared<EmptyBehaviour>())
 	{}
@@ -21,12 +26,12 @@ public:
 		m_button_behaviour = i_behaviour;
 	}
 
-	std::shared_ptr<ButtonLayout> get_layout() const
+	[[nodiscard]] std::shared_ptr<ButtonLayout> get_layout() const
 	{
 		return m_layout;
 	}
 
-	std::shared_ptr<ButtonBehaviour> get_behaviour() const
+	[[nodiscard]] std::shared_ptr<ButtonBehaviour> get_behaviour() const
 	{
 		return m_button_behaviour;
 	}
@@ -42,9 +47,9 @@ public:
 		return m_layout->is_hovered();
 	}
 
-	void update(const sf::Vector2f& mouse_position, const bool mouse_pressed) const
+	void update(const std::shared_ptr<Eventsystem>& eventsystem) const
 	{
-		m_layout->update(mouse_position,mouse_pressed);
+		m_layout->update(eventsystem);
 	}
 
 	[[nodiscard]] bool on_click(std::shared_ptr<LayerManager>& layer_manager, std::shared_ptr<Soundsystem>& soundsystem,
@@ -69,13 +74,12 @@ public:
 		m_layout->set_is_hovered(hovered);
 	}
 
-	void set_text(const std::string& i_string) const
+	void set_data(const std::string& i_string) const
 	{
-		m_layout->set_text(i_string);
+		m_layout->set_data(i_string);
 	}
 
 private:
 	std::shared_ptr<ButtonLayout> m_layout;
 	std::shared_ptr<ButtonBehaviour> m_button_behaviour;
 };
-

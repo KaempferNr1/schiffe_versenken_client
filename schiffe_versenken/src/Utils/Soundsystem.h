@@ -22,63 +22,6 @@ public:
 		sf::SoundBuffer m_buffer;
 	};
 
-
-	//constructors and destructors
-public:
-
-	~Soundsystem();
-	Soundsystem(float tilesize, bool use_tile_size);
-	Soundsystem() = delete;
-	Soundsystem(const Soundsystem&) = delete;
-	Soundsystem operator=(const Soundsystem&) = delete;
-	Soundsystem(Soundsystem&&) = delete;
-	Soundsystem operator=(Soundsystem&&) = delete;
-
-
-
-	//getter and setter
-public:
-
-	[[nodiscard]] std::unordered_map<std::string, std::deque<std::pair<std::deque<sf::Sound>, bool>>>& get_all_sounds();
-
-	[[nodiscard]] const std::unordered_map<std::string, std::deque<std::pair<std::deque<sf::Sound>, bool>>>& get_all_sounds() const;
-
-	[[nodiscard]] std::deque<std::pair<std::deque<sf::Sound>, bool>>* get_sounds_by_group(const std::string& group_id);
-
-	[[nodiscard]] const std::deque<std::pair<std::deque<sf::Sound>, bool>>* get_sounds_by_group(const std::string& group_id) const;
-
-	[[nodiscard]] std::deque<sf::Sound>* get_sound_by_group_and_id(const std::string& group_id,const uint32_t sound_id);
-
-	[[nodiscard]] const std::deque<sf::Sound>* get_sound_by_group_and_id(const std::string& group_id,const uint32_t sound_id) const;
-
-	[[nodiscard]] std::unordered_map<std::string, float> get_volumes() const;
-
-	void set_should_play_music(bool should_play_music);
-
-	[[nodiscard]] bool is_should_play_music() const;
-
-	void set_use_tile_size(bool i_use_tile_size);
-
-	[[nodiscard]] bool is_use_tile_size() const;
-
-	void set_tilesize(float i_tilesize);
-
-	[[nodiscard]] float get_tilesize() const;
-
-	void set_stop_playing_sounds(bool i_stop_adding_new_sounds);
-
-	[[nodiscard]] bool get_stop_playing_sounds() const;
-
-	[[nodiscard]] size_t get_group_size(int group_id) const;
-
-	[[nodiscard]] size_t get_group_size(const std::string& group_id) const;
-
-	[[nodiscard]] std::unordered_map<std::string, size_t> get_group_names() const;
-
-	//sets the music indices that can play
-	//note if the index is out of range an index of 0 is being used
-	void set_music_indices(const std::vector<int>& i_music_indices);
-
 public:
 	void add_group(const std::string& group);
 
@@ -114,8 +57,61 @@ public:
 
 	void decrement_volume(float decrease, const std::string& group_id);
 
+	void trigger_volume_update();
 
 	void update();
+
+	//getter and setter
+	[[nodiscard]] std::unordered_map<std::string, std::deque<std::pair<std::deque<sf::Sound>, bool>>>& get_all_sounds();
+
+	[[nodiscard]] const std::unordered_map<std::string, std::deque<std::pair<std::deque<sf::Sound>, bool>>>& get_all_sounds() const;
+
+	[[nodiscard]] std::deque<std::pair<std::deque<sf::Sound>, bool>>* get_sounds_by_group(const std::string& group_id);
+
+	[[nodiscard]] const std::deque<std::pair<std::deque<sf::Sound>, bool>>* get_sounds_by_group(const std::string& group_id) const;
+
+	[[nodiscard]] std::deque<sf::Sound>* get_sound_by_group_and_id(const std::string& group_id,const uint32_t sound_id);
+
+	[[nodiscard]] const std::deque<sf::Sound>* get_sound_by_group_and_id(const std::string& group_id,const uint32_t sound_id) const;
+
+	[[nodiscard]] std::unordered_map<std::string, float> get_volumes() const;
+
+	[[nodiscard]] std::unordered_map<std::string, float>& get_volumes();
+
+	void set_should_play_music(bool should_play_music);
+
+	[[nodiscard]] bool is_should_play_music() const;
+
+	void set_use_tile_size(bool i_use_tile_size);
+
+	[[nodiscard]] bool is_use_tile_size() const;
+
+	void set_tilesize(float i_tilesize);
+
+	[[nodiscard]] float get_tilesize() const;
+
+	void set_stop_playing_sounds(bool i_stop_adding_new_sounds);
+
+	[[nodiscard]] bool get_stop_playing_sounds() const;
+
+	[[nodiscard]] size_t get_group_size(int group_id) const;
+
+	[[nodiscard]] size_t get_group_size(const std::string& group_id) const;
+
+	[[nodiscard]] std::unordered_map<std::string, size_t> get_group_names() const;
+
+	void set_music_indices(const std::vector<int>& i_music_indices);
+
+
+//constructors and destructors
+
+	~Soundsystem();
+	Soundsystem(float tilesize, bool use_tile_size);
+	Soundsystem() = delete;
+	Soundsystem(const Soundsystem&) = delete;
+	Soundsystem operator=(const Soundsystem&) = delete;
+	Soundsystem(Soundsystem&&) = delete;
+	Soundsystem operator=(Soundsystem&&) = delete;
 
 	//run method which runs on another thread
 private:
@@ -125,7 +121,7 @@ private:
 
 	void stop_thread();
 
-private:
+
 	void change_music();
 
 	[[nodiscard]] bool validate_group_id(int input) const;
@@ -134,8 +130,7 @@ private:
 
 	[[nodiscard]] size_t internal_get_group_size(const std::string& group_id) const;
 
-	//private methods to have one location for logic
-private:
+
 	void internal_play_sound(int group_id, int sound_id, sf::Vector3f pos, bool use_positioning);
 
 	void internal_play_sound(const std::string& group_id, int sound_id, sf::Vector3f pos, bool use_positioning);
@@ -174,30 +169,15 @@ private:
 	void clear_all();
 
 
-	//attributes for handling of multithreading
 private:
 	std::mutex m_mutex;
 	std::condition_variable m_cv;
 	std::thread m_thread;
 
-	//attributes to know if something changed
-private:
-	bool m_new_data = false;
-	bool m_stop = false;
-	bool m_should_play_music = false;
-	bool m_prev_should_play_music = true;
-	std::unordered_map<std::string, float> m_new_volumes;
-
-	bool m_use_tile_size = false;
-	float m_tilesize;
-	bool m_stop_playing_sounds = false;
-	bool m_prev_stop_playing_sounds = false;
-
-	//sound data and mappings
-private:
 	typedef std::pair<std::deque<sf::Sound>, bool> sounds;
 	typedef std::deque<sounds> sound_group;
 
+	std::unordered_map<std::string, float> m_new_volumes;
 	std::unordered_map<int, std::string> m_mapping;
 	std::unordered_map<std::string, float> m_volumes;
 	std::unordered_map<std::string, std::deque<Soundmetadata>> m_sounds_meta_data;
@@ -205,6 +185,17 @@ private:
 
 	int m_current_music = -1;
 	int m_current_music_index = -1;
-	inline static size_t s_current_playing_sounds = 0;
 	std::vector<int> m_music_indices{0};
+	
+	float m_tilesize;
+	bool m_use_tile_size = false;
+	bool m_stop_playing_sounds = false;
+	bool m_prev_stop_playing_sounds = false;
+
+	bool m_new_data = false;
+	bool m_should_play_music = false;
+	bool m_prev_should_play_music = true;
+	bool m_stop = false;
+	
+	inline static size_t s_current_playing_sounds = 0;
 };

@@ -365,7 +365,7 @@ void Soundsystem::internal_load_buffer(const std::string& location, const bool o
 }
 
 
-Soundsystem::Soundsystem(const float tilesize, const bool use_tile_size) : m_use_tile_size(use_tile_size), m_tilesize(tilesize)
+Soundsystem::Soundsystem(const float tilesize, const bool use_tile_size) : m_tilesize(tilesize), m_use_tile_size(use_tile_size)
 {
 	sf::Listener::setPosition({0.f, 0.f, 0.f});
 	add_group(Soundsystem_GlobalStr);
@@ -375,13 +375,12 @@ Soundsystem::Soundsystem(const float tilesize, const bool use_tile_size) : m_use
 	start_thread();
 }
 
-std::unordered_map<std::string, std::deque<std::pair<std::deque<sf::Sound>, bool>>>& Soundsystem::get_all_sounds()
+std::unordered_map<std::string, Soundsystem::sound_group>& Soundsystem::get_all_sounds()
 {
 	return m_sounds;
 }
 
-const std::unordered_map<std::string, std::deque<std::pair<std::deque<sf::Sound>, bool>>>& Soundsystem::
-get_all_sounds() const
+const std::unordered_map<std::string, Soundsystem::sound_group>& Soundsystem::get_all_sounds() const
 {
 	return m_sounds;
 }
@@ -509,6 +508,12 @@ void Soundsystem::stop_thread()
 }
 
 std::unordered_map<std::string, float> Soundsystem::get_volumes() const
+{
+	LOG_TRACE("get_volumes called");
+	return m_volumes;
+}
+
+std::unordered_map<std::string, float>& Soundsystem::get_volumes()
 {
 	LOG_TRACE("get_volumes called");
 	return m_volumes;
@@ -1024,6 +1029,11 @@ void Soundsystem::decrement_volume(const float decrease, const std::string& grou
 	std::lock_guard lock(m_mutex);
 	LOG_TRACE("forwarding arguments to internal_increment_volume");
 	internal_increment_volume(-decrease, group_id);
+}
+
+void Soundsystem::trigger_volume_update()
+{
+	m_new_volumes = m_volumes;
 }
 
 void Soundsystem::update()

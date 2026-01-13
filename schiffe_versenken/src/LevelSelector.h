@@ -20,10 +20,8 @@ public:
 
 	[[nodiscard]] LayerID get_layer_id() override;
 private:
-	int m_selected_x = -1;
-	int m_selected_y = -1;
 	sf::Texture background;
-
 	std::vector<std::shared_ptr<Button>> m_buttons;
+	int m_selected = -1;
 };
 

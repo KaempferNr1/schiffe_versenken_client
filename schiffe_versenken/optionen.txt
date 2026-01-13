@@ -1,4 +1,4 @@
-global;45
+global;7.75
 music;100
-ui_sounds;100
-player_sounds;100
+game_sounds;40.25
+ui_sounds;53.75

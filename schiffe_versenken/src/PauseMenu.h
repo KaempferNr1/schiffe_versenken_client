@@ -17,9 +17,9 @@ public:
 
 	[[nodiscard]] LayerID get_layer_id() override;
 private:
+
+	std::vector<std::unique_ptr<Button>> m_buttons;
+	std::shared_ptr<Layer> m_background_layer;
 	int m_selected = -1;
 
-	std::vector<std::shared_ptr<Button>> m_buttons;
-
-	std::shared_ptr<Layer> m_background_layer;
 };

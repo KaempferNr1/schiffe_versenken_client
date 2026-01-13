@@ -1,6 +1,6 @@
 #include "PauseMenu.h"
 
-#include "Buttons/Button.h"
+#include "UI/Button.h"
 #include "Eventsystem.h"
 #include "LayerManager.h"
 #include "Utils/Log.h"
@@ -10,17 +10,17 @@
 PauseMenu::PauseMenu(const std::shared_ptr<Layer>& background_layer)
 	:m_background_layer(background_layer)
 {
-	m_buttons.emplace_back(std::make_shared<Button>());
-	m_buttons.emplace_back(std::make_shared<Button>());
-	m_buttons.emplace_back(std::make_shared<Button>());
+	m_buttons.emplace_back(std::make_unique<Button>());
+	m_buttons.emplace_back(std::make_unique<Button>());
+	m_buttons.emplace_back(std::make_unique<Button>());
 
-	m_buttons[0]->set_layout(std::make_shared<TextLayout>("continue", sf::Vector2f{ 260.f,145.f }, sf::Vector2f{ 200.f,50.f }, 0.f,sf::Color::Yellow));
+	m_buttons[0]->set_layout(std::make_shared<TextLayout>("continue", sf::Vector2f{ 260.f,145.f }, Button::large_button_size, 0.f,sf::Color::Yellow));
 	m_buttons[0]->set_behaviour(std::make_shared<PopLayer>());
 
-	m_buttons[1]->set_layout(std::make_shared<TextLayout>("options", sf::Vector2f{ 260.f,215.f }, sf::Vector2f{ 200.f,50.f }, 0.f,sf::Color::Yellow));
+	m_buttons[1]->set_layout(std::make_shared<TextLayout>("options", sf::Vector2f{ 260.f,215.f }, Button::large_button_size, 0.f,sf::Color::Yellow));
 	m_buttons[1]->set_behaviour(std::make_shared<AddOptionsMenu>());
 
-	m_buttons[2]->set_layout(std::make_shared<TextLayout>("main menu", sf::Vector2f{ 260.f,285.f }, sf::Vector2f{ 200.f,50.f },0.f,  sf::Color::Yellow));
+	m_buttons[2]->set_layout(std::make_shared<TextLayout>("main menu", sf::Vector2f{ 260.f,285.f }, Button::large_button_size,0.f,  sf::Color::Yellow));
 	m_buttons[2]->set_behaviour(std::make_shared<GoBackTillLayer>(LayerID::main_menu));
 }
 
@@ -37,25 +37,19 @@ void PauseMenu::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_pt
 	const sf::Vector2f mouse_pos = eventsystem->get_mouse_position();
 
 	constexpr float padding = 20.0f;
-	constexpr float button_size = 50.f;
-	const float total_height = static_cast<float>(m_buttons.size()) * button_size + (static_cast<float>(m_buttons.size()) - 1.f) * padding;
+	const float total_height = static_cast<float>(m_buttons.size()) * Button::large_button_size.y + (static_cast<float>(m_buttons.size()) - 1.f) * padding;
 	const float start_y = (static_cast<float>(eventsystem->get_window_size().y) - total_height) / 2.f;
-	const float start_x = static_cast<float>(eventsystem->get_window_size().x) / 2.f - 100.f;
-	//const sf::Vector2f difference_to_center = sf::Vector2f{ start_x,start_y } - window.getView().getCenter();
+	const float start_x = static_cast<float>(eventsystem->get_window_size().x) / 2.f - Button::large_button_size.x/2;
 
 	for (uint8_t i = 0; i < m_buttons.size(); ++i)
 	{
-		m_buttons[i]->set_position({ start_x ,start_y + static_cast<float>(i) * (50.f + padding) });
-		m_buttons[i]->update(mouse_pos, eventsystem->get_mouse_button_action(sf::Mouse::Button::Left) == Eventsystem::action_released);
+		m_buttons[i]->set_position({ start_x ,start_y + static_cast<float>(i) * (Button::large_button_size.y + padding) });
+		m_buttons[i]->update(eventsystem);
 		if (!m_buttons[i]->is_clicked())
 			continue;
 
 		if (m_buttons[i]->on_click(layer_manager, soundsystem, window)) 
 		{
-			//if(i == 2)
-			//{
-			//	soundsystem->set_music_indices({ 0,1,2 });
-			//}
 			m_selected = -1;
 			return;
 		}
@@ -78,9 +72,6 @@ void PauseMenu::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_pt
 
 	if (eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_released)
 	{
-		//if (m_selected == 2)
-		//	soundsystem->set_music_indices({ 0,1,2 });
-		
 		if (m_buttons[m_selected]->on_click(layer_manager, soundsystem, window))
 			m_selected = -1;
 
