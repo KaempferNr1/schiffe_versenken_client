@@ -14,7 +14,7 @@ enum class LayerID
     level_selector,
     options,
 	reconnect_screen,
-
+	versus_com,
     idle_layer,
 };
 

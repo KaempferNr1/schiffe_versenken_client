@@ -20,7 +20,7 @@
 
 
 
-Game::Game(std::shared_ptr<Soundsystem>& soundsystem)
+Game::Game([[maybe_unused]] std::shared_ptr<Soundsystem>& soundsystem)
 {
 	if (!m_font.openFromMemory(g_RobotoRegular, sizeof(g_RobotoRegular)))
 	{
@@ -105,7 +105,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			m_status = status::GAME_DONE;
 			std::vector<std::vector<int8_t>> temp_map = answer["board"];
 			std::array<std::vector<std::pair<int, int>>,5> coordinates;
-			int8_t horizontal;
+			int8_t horizontal = 0;
 			for(int i = 0; i < 10; i++)
 			{
 				for(int j = 0; j < 10;j++)
@@ -126,7 +126,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			for (int i = 0; i < coordinates.size();++i)
 			{
 				const bool is_horizontal = (horizontal >> i) & 1;
-				const int length = coordinates[i].size();
+				const int length = static_cast<int>(coordinates[i].size());
 				if (length == 0)
 					continue;
 				const int row = coordinates[i].front().first;
@@ -179,7 +179,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			const int col = answer["col"];
 			const int length = answer["length"];
 			const int is_horizontal = answer["is_horizontal"];
-			m_ships.emplace_back(place_ship(row, col, length, is_horizontal,m_ship_map,m_ships.size(),player_map_offset)).sprite.setTexture(&m_ship_texture);
+			m_ships.emplace_back(place_ship(row, col, length, is_horizontal,m_ship_map,static_cast<int>(m_ships.size()),player_map_offset)).sprite.setTexture(&m_ship_texture);
 		}
 	}
 

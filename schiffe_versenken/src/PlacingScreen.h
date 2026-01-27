@@ -33,26 +33,26 @@ Ship place_ship(int row, int col, int length, int is_horizontal, std::array<std:
 void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, int8_t type, sf::Vector2f offset);
 
 
-class PlacingScreen : public Layer
-{
-private:
-	sf::Texture* m_ship_texture;
-	sf::Texture* m_background_texture;
-	std::vector<int> m_ships_to_place;
-	int m_row{0};
-	int m_col{0};
-	int m_selected{0};
-	bool m_is_horizontal{0};
-	bool m_online;
-	std::function<void(int,int,int,bool)> m_ship_place_function;
-public:
-	PlacingScreen();
-	void update([[maybe_unused]] std::shared_ptr<Eventsystem>& eventsystem, [[maybe_unused]] std::shared_ptr<LayerManager>& layer_manager,
-	            [[maybe_unused]] std::shared_ptr<Soundsystem>& soundsystem, [[maybe_unused]] sf::RenderWindow& window, [[maybe_unused]] double deltatime) override;
-
-	void render([[maybe_unused]] sf::RenderWindow& window) override;
-
-	void on_close() override;
-	[[nodiscard]] LayerID get_layer_id() override;
-};
-
+//class PlacingScreen : public Layer
+//{
+//private:
+//	sf::Texture* m_ship_texture;
+//	sf::Texture* m_background_texture;
+//	std::vector<int> m_ships_to_place;
+//	int m_row{0};
+//	int m_col{0};
+//	int m_selected{0};
+//	bool m_is_horizontal{0};
+//	bool m_online;
+//	std::function<void(int,int,int,bool)> m_ship_place_function;
+//public:
+//	PlacingScreen();
+//	void update([[maybe_unused]] std::shared_ptr<Eventsystem>& eventsystem, [[maybe_unused]] std::shared_ptr<LayerManager>& layer_manager,
+//	            [[maybe_unused]] std::shared_ptr<Soundsystem>& soundsystem, [[maybe_unused]] sf::RenderWindow& window, [[maybe_unused]] double deltatime) override;
+//
+//	void render([[maybe_unused]] sf::RenderWindow& window) override;
+//
+//	void on_close() override;
+//	[[nodiscard]] LayerID get_layer_id() override;
+//};
+//

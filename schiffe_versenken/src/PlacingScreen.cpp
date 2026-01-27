@@ -142,7 +142,7 @@ Ship place_ship(int row, int col, int length, int is_horizontal, std::array<std:
 			const int current_row = row + offset_in_row;
 			const int current_col = col + offset_in_col;
 			coordinates.emplace_back(current_row, current_col);
-			ship_map[current_row][current_col] = 1 + ship_index;
+			ship_map[current_row][current_col] = static_cast<int8_t>(ship_index + 1);
 		}
 	}
 	sf::RectangleShape sprite = create_ship_sprite(row, col, length, is_horizontal, offset);
@@ -177,72 +177,72 @@ void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, 
 	vertex_array.append(vertex4);
 }
 
-PlacingScreen::PlacingScreen()
-{
-	m_ships_to_place = {1,2,1,1};
-
-	//nlohmann::json message;
-	//message["type"] = "game";
-	//message["kind"] = "place";
-	//message["row"] = m_row;
-	//message["col"] = m_col;
-	//message["length"] = m_length;
-	//message["is_horizontal"] = m_is_horizontal;
-	//sf::Packet packet;
-	//packet << message.dump();
-	//m_client->m_packets_to_be_sent.push_back(packet);
-
-}
-
-void PlacingScreen::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<LayerManager>& layer_manager,
-                           std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window, double deltatime)
-{
-	//ImGui::Begin("debug");
-
-
-	//if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
-	//	m_row = (m_row + 1) % 10;
-	//if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
-	//	|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
-	//	m_row = m_row - 1 < 0 ? 9 : m_row - 1;
-
-	//if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
-	//	|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
-	//	m_col = (m_col + 1) % 10;
-	//if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
-	//	|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
-	//	m_col = m_col - 1 < 0 ? 9 : m_col - 1;
-
-	//if (eventsystem->get_key_action(sf::Keyboard::Key::R) == Eventsystem::action_pressed)
-	//	m_is_horizontal = !m_is_horizontal;
-	//if (eventsystem->get_key_action(sf::Keyboard::Key::E) == Eventsystem::action_pressed)
-	//	m_selected = m_selected + 1 > m_ships_to_place.size() ? 0 : m_selected + 1;
-	//if (eventsystem->get_key_action(sf::Keyboard::Key::Q) == Eventsystem::action_pressed)
-	//	m_selected = m_selected - 1 < 0 ? m_ships_to_place.size() - 1 : m_selected - 1;
-
-	//ImGui::SliderInt("row", &m_row, 0, 9);
-	//ImGui::SliderInt("col", &m_col, 0, 9);
-	//ImGui::Checkbox("is horizontal", &m_is_horizontal);
-	//if (ImGui::Button("place ship") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
-	//{
-
-	//	m_ship_place_function(m_row, m_col, m_ships_to_place[m_selected],m_is_horizontal);
-	//}
-
-	//ImGui::End();
-}
-
-void PlacingScreen::render(sf::RenderWindow& window)
-{
-
-}
-
-void PlacingScreen::on_close()
-{
-	
-}
-
-LayerID PlacingScreen::get_layer_id()
-{
-	return LayerID::game;
-}
+//PlacingScreen::PlacingScreen()
+//{
+//	m_ships_to_place = {1,2,1,1};
+//
+//	//nlohmann::json message;
+//	//message["type"] = "game";
+//	//message["kind"] = "place";
+//	//message["row"] = m_row;
+//	//message["col"] = m_col;
+//	//message["length"] = m_length;
+//	//message["is_horizontal"] = m_is_horizontal;
+//	//sf::Packet packet;
+//	//packet << message.dump();
+//	//m_client->m_packets_to_be_sent.push_back(packet);
+//
+//}
+//
+//void PlacingScreen::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<LayerManager>& layer_manager,
+//                           std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window, double deltatime)
+//{
+//	//ImGui::Begin("debug");
+//
+//
+//	//if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
+//	//	m_row = (m_row + 1) % 10;
+//	//if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
+//	//	|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
+//	//	m_row = m_row - 1 < 0 ? 9 : m_row - 1;
+//
+//	//if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
+//	//	|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
+//	//	m_col = (m_col + 1) % 10;
+//	//if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
+//	//	|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
+//	//	m_col = m_col - 1 < 0 ? 9 : m_col - 1;
+//
+//	//if (eventsystem->get_key_action(sf::Keyboard::Key::R) == Eventsystem::action_pressed)
+//	//	m_is_horizontal = !m_is_horizontal;
+//	//if (eventsystem->get_key_action(sf::Keyboard::Key::E) == Eventsystem::action_pressed)
+//	//	m_selected = m_selected + 1 > m_ships_to_place.size() ? 0 : m_selected + 1;
+//	//if (eventsystem->get_key_action(sf::Keyboard::Key::Q) == Eventsystem::action_pressed)
+//	//	m_selected = m_selected - 1 < 0 ? m_ships_to_place.size() - 1 : m_selected - 1;
+//
+//	//ImGui::SliderInt("row", &m_row, 0, 9);
+//	//ImGui::SliderInt("col", &m_col, 0, 9);
+//	//ImGui::Checkbox("is horizontal", &m_is_horizontal);
+//	//if (ImGui::Button("place ship") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
+//	//{
+//
+//	//	m_ship_place_function(m_row, m_col, m_ships_to_place[m_selected],m_is_horizontal);
+//	//}
+//
+//	//ImGui::End();
+//}
+//
+//void PlacingScreen::render(sf::RenderWindow& window)
+//{
+//
+//}
+//
+//void PlacingScreen::on_close()
+//{
+//	
+//}
+//
+//LayerID PlacingScreen::get_layer_id()
+//{
+//	return LayerID::game;
+//}
