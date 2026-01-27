@@ -114,3 +114,10 @@ public:
 private:
 	std::shared_ptr<Client> m_client;
 };
+
+class AddVersusComLayer : public ButtonBehaviour
+{
+public:
+	AddVersusComLayer() = default;
+	[[nodiscard]] bool on_click(std::shared_ptr<LayerManager>& layer_manager, std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window) override;
+};

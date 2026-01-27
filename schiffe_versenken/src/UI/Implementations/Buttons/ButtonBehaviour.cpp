@@ -12,6 +12,7 @@
 #include "Utils/Random.h"
 #include "Utils/Soundsystem.h"
 #include "Client.h"
+#include "VersusCom.h"
 
 
 
@@ -94,5 +95,12 @@ bool FindMatch::on_click([[maybe_unused]] std::shared_ptr<LayerManager>& layer_m
 	sf::Packet packet;
 	packet << message.dump();
 	m_client->m_packets_to_be_sent.push_back(packet);
+	return true;
+}
+
+bool AddVersusComLayer::on_click(std::shared_ptr<LayerManager>& layer_manager,
+	std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window)
+{
+	layer_manager->push_layer(std::make_shared<VersusCom>());
 	return true;
 }

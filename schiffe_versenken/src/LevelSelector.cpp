@@ -18,7 +18,7 @@ LevelSelector::LevelSelector()
 	m_buttons[0]->set_behaviour(std::make_shared<AddGameLayer>());
 
 	m_buttons[1]->set_layout(std::make_shared<TextLayout>("vs com", sf::Vector2f{ 260.f,145.f }, Button::large_button_size, 0.f, sf::Color::Yellow));
-	m_buttons[1]->set_behaviour(std::make_shared<AddGameLayer>());
+	m_buttons[1]->set_behaviour(std::make_shared<AddVersusComLayer>());
 
 	m_buttons[2]->set_layout(std::make_shared<TextLayout>("zurrück", sf::Vector2f{ 260.f,285.f }, Button::large_button_size, 0.f, sf::Color::Yellow));
 	m_buttons[2]->set_behaviour(std::make_shared<PopLayer>());

@@ -42,8 +42,8 @@ private:
 	std::shared_ptr<LayerManager> m_layer_manager;
 	std::shared_ptr<Layer> m_current_layer;
 
-	std::vector<Ship> m_ships;
 	nlohmann::json m_server_info;
+	std::vector<Ship> m_ships;
 
 	sf::Texture m_player_background_texture;
 	sf::Texture m_opponent_background_texture;

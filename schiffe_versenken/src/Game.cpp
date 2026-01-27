@@ -54,33 +54,8 @@ Game::~Game()
 {
 	LOG_INFO("game destructed");
 }
-void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, int8_t type, sf::Vector2f offset)
-{
-	const sf::Vector2f cell_position{ (float)col * cell_size.x + offset.x ,(float)row * cell_size.y + offset.y};
 
 
-	constexpr sf::Vector2f single_sprite_size = {32.f,32.f};
-	const sf::Vector2f top_left_tex_coord{(float)type * single_sprite_size.x,0.f};
-	const sf::Vector2f bottom_right_tex_coord = top_left_tex_coord + single_sprite_size;
-
-
-	const sf::Vertex vertex1 = {.position = cell_position, .color = {sf::Color::White}, .texCoords = {top_left_tex_coord} };
-	const sf::Vertex vertex2 = {.position = { cell_position.x + single_sprite_size.x,cell_position.y }, .color = {sf::Color::White},
-		.texCoords = { bottom_right_tex_coord.x,top_left_tex_coord.y} };
-	const sf::Vertex vertex3 = {.position = { cell_position.x,cell_position.y + single_sprite_size.y }, .color = {sf::Color::White},
-		.texCoords = { top_left_tex_coord.x,bottom_right_tex_coord.y } };
-	const sf::Vertex vertex4 = {.position = cell_position + single_sprite_size, .color = {sf::Color::White},
-		.texCoords = {bottom_right_tex_coord} };
-
-
-	vertex_array.append(vertex1);
-	vertex_array.append(vertex2);
-	vertex_array.append(vertex3);
-	vertex_array.append(vertex2);
-	vertex_array.append(vertex3);
-	vertex_array.append(vertex4);
-
-}
 
 
 
@@ -420,6 +395,7 @@ void Game::render(sf::RenderWindow& window)
 
 		sf::RectangleShape selection = create_ship_sprite(m_row, m_col, m_length, m_is_horizontal, player_map_offset);
 		selection.setTexture(&m_ship_texture);
+		selection.setFillColor({ 255,255,255,127 });
 		window.draw(selection);
 		return;
 	}

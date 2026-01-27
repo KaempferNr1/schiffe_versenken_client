@@ -44,7 +44,7 @@
     <ClInclude Include="src\ReconnectScreen.h" />
     <ClInclude Include="src\IdleLayer.h" />
     <ClInclude Include="src\UI\Slider.h" />
-    <ClInclude Include="VersusCom.h" />
+    <ClInclude Include="src\VersusCom.h" />
     <ClInclude Include="src\PlacingScreen.h" />
   </ItemGroup>
   <ItemGroup>
@@ -79,7 +79,7 @@
     <ClCompile Include="src\ReconnectScreen.cpp" />
     <ClCompile Include="src\IdleLayer.cpp" />
     <ClCompile Include="src\UI\Implementations\Slider.cpp" />
-    <ClCompile Include="VersusCom.cpp" />
+    <ClCompile Include="src\VersusCom.cpp" />
     <ClCompile Include="src\PlacingScreen.cpp" />
   </ItemGroup>
   <ItemGroup>

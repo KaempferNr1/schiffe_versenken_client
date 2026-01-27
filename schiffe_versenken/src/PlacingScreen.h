@@ -30,6 +30,8 @@ sf::RectangleShape create_ship_sprite(const int row, const int col, const int le
 
 Ship place_ship(int row, int col, int length, int is_horizontal, std::array<std::array<int8_t, 10>, 10>& ship_map, int ship_index, sf::Vector2f offset);
 
+void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, int8_t type, sf::Vector2f offset);
+
 
 class PlacingScreen : public Layer
 {
@@ -40,7 +42,9 @@ private:
 	int m_row{0};
 	int m_col{0};
 	int m_selected{0};
+	bool m_is_horizontal{0};
 	bool m_online;
+	std::function<void(int,int,int,bool)> m_ship_place_function;
 public:
 	PlacingScreen();
 	void update([[maybe_unused]] std::shared_ptr<Eventsystem>& eventsystem, [[maybe_unused]] std::shared_ptr<LayerManager>& layer_manager,
