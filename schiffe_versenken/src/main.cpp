@@ -73,28 +73,12 @@ int Main([[maybe_unused]] const int argc, [[maybe_unused]] char** argv)
 
 	window.setFramerateLimit(0);
     sf::Clock delta_clock;
-    double current_fps = 0;
-    int current_frames = 0;
-    double condt = 0;
 	while (window.isOpen())
     {
-        current_frames++;
         eventsystem->handle_updates(window);
 		const double deltatime = static_cast<double>(delta_clock.getElapsedTime().asSeconds());
 		ImGui::SFML::Update(window, delta_clock.restart());
-        condt += deltatime;
-
-        ImGui::Begin("debug");
-        if (condt > 1)
-        {
-            current_fps = static_cast<double>(current_frames) / condt;
-            condt = 0;
-            current_frames = 0;
-        }
-
-		ImGui::Text("fps: %.2f", current_fps);
-
-		ImGui::End();
+    
     	const std::shared_ptr<Layer> current_layer = layer_manager->get_top();
 		current_layer->update(eventsystem,layer_manager,soundsystem,window,deltatime);
 
@@ -164,11 +148,9 @@ std::shared_ptr<Eventsystem> init_eventsystem(sf::RenderWindow& window)
     eventsystem->add_key_listener(sf::Keyboard::Key::A);
     eventsystem->add_key_listener(sf::Keyboard::Key::S);
     eventsystem->add_key_listener(sf::Keyboard::Key::D);
-    eventsystem->add_key_listener(sf::Keyboard::Key::G);
     eventsystem->add_key_listener(sf::Keyboard::Key::Q);
-    eventsystem->add_key_listener(sf::Keyboard::Key::R);
-    eventsystem->add_key_listener(sf::Keyboard::Key::T);
     eventsystem->add_key_listener(sf::Keyboard::Key::E);
+    eventsystem->add_key_listener(sf::Keyboard::Key::R);
     eventsystem->add_key_listener(sf::Keyboard::Key::Up);
     eventsystem->add_key_listener(sf::Keyboard::Key::Down);
     eventsystem->add_key_listener(sf::Keyboard::Key::Left);
@@ -197,17 +179,20 @@ std::shared_ptr<Soundsystem> init_soundsystem()
     soundsystem->add_group("ui_sounds");
     soundsystem->add_group("game_sounds");
 
+    soundsystem->set_should_play_music(false);
+
+    /*
     const std::filesystem::path music_sounds{ std::filesystem::path("Resources") / "Sounds" / "Music" };
     std::vector<int> music_indices;
     for (auto const& dir_entry : std::filesystem::directory_iterator{ music_sounds })
     {
-        LOG_INFO("{}", dir_entry.path().string());
+    	LOG_INFO("{}", dir_entry.path().string());
         music_indices.emplace_back(static_cast<int>(music_indices.size()));
         soundsystem->load_buffer(dir_entry.path().string(), false, "music");
     }
     soundsystem->set_music_indices(music_indices);
     soundsystem->set_should_play_music(!music_indices.empty());
-
+    */
 
     std::ifstream fin("optionen.txt");
     std::unordered_map volumes = soundsystem->get_volumes();

@@ -168,6 +168,7 @@
     <ClInclude Include="src\Utils\Random.h" />
     <ClInclude Include="src\Utils\Soundsystem.h" />
     <ClInclude Include="src\Utils\Timer.h" />
+    <ClInclude Include="VersusCom.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UI\Implementations\Slider.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="src\Utils\Random.cpp" />
     <ClCompile Include="src\Utils\Soundsystem.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="VersusCom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Vendor\imgui\ImGui.vcxproj">

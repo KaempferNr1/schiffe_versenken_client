@@ -2,6 +2,7 @@
 #include <deque>
 #include <memory>
 #include <unordered_map>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Network/Packet.hpp>
@@ -15,7 +16,7 @@ class Game;
 struct Ship
 {
     std::vector<std::pair<int, int>> coordinates;
-    sf::Sprite sprite;
+    sf::RectangleShape sprite;
     int segments_left{ 1 };
     bool destroyed{ false };
 

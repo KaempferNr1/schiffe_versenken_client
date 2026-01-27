@@ -27,7 +27,6 @@ PauseMenu::PauseMenu(const std::shared_ptr<Layer>& background_layer)
 void PauseMenu::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<LayerManager>& layer_manager,
 	std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window, [[maybe_unused]] double deltatime)
 {
-	m_background_layer->update(eventsystem, layer_manager, soundsystem, window, deltatime); 
 	if (eventsystem->get_key_action(sf::Keyboard::Key::Escape) == Eventsystem::action_pressed)
 	{
 		layer_manager->pop_layer();
@@ -54,29 +53,38 @@ void PauseMenu::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_pt
 			return;
 		}
 	}
+	const bool is_down_pressed = eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed;
+	const bool is_up_pressed = eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed;
+	const bool is_left_mouse_button_pressed = eventsystem->get_mouse_button_action(sf::Mouse::Button::Left) == Eventsystem::action_pressed;
 
-
-	if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed)
+	
+	if (is_down_pressed)
 		m_selected = m_selected + 1 == static_cast<int>(m_buttons.size()) ? 0 : m_selected + 1;
 
-	if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed)
+	if (is_up_pressed)
 		m_selected = m_selected - 1 < 0 ? static_cast<int>(m_buttons.size()) - 1 : m_selected - 1;
 
-	if (eventsystem->get_mouse_button_action(sf::Mouse::Button::Left) == Eventsystem::action_pressed)
+	if (is_left_mouse_button_pressed)
 		m_selected = -1;
 
-	if (m_selected == -1)
-		return;
 
-	m_buttons[m_selected]->set_is_hovered(true);
-
-	if (eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_released)
+	if (m_selected != -1)
 	{
-		if (m_buttons[m_selected]->on_click(layer_manager, soundsystem, window))
-			m_selected = -1;
-
-		return;
+		m_buttons[m_selected]->set_is_hovered(true);
+		if (eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_released)
+		{
+			if (m_buttons[m_selected]->on_click(layer_manager, soundsystem, window))
+				m_selected = -1;
+		}
 	}
+
+	eventsystem->block_key(sf::Keyboard::Key::Escape);
+	eventsystem->block_key(sf::Keyboard::Key::Down);
+	eventsystem->block_key(sf::Keyboard::Key::Up);
+	eventsystem->block_key(sf::Keyboard::Key::Enter);
+	eventsystem->block_mouse_button(sf::Mouse::Button::Left);
+	m_background_layer->update(eventsystem, layer_manager, soundsystem, window, deltatime);
+
 }
 
 void PauseMenu::render(sf::RenderWindow& window)

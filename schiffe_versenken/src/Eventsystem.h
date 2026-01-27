@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -50,13 +51,18 @@ public:
 
 	[[nodiscard]] bool has_focus() const;
 
+	void block_key(sf::Keyboard::Key key) { m_keys_to_block.insert(key); }
+	void block_mouse_button(sf::Mouse::Button button) { m_mouse_buttons_to_block.insert(button); }
+
+
 private:
 	bool m_focus = true;
-
+	std::unordered_set<sf::Keyboard::Key> m_keys_to_block;
 	std::unordered_map<sf::Keyboard::Key, bool> m_key_states;
 	std::unordered_map<sf::Keyboard::Key, action> m_key_actions;
 	std::unordered_map<sf::Keyboard::Key, std::function<void(sf::Keyboard::Key, action)>> m_key_events_callbacks;
 
+	std::unordered_set<sf::Mouse::Button> m_mouse_buttons_to_block;
 	std::unordered_map<sf::Mouse::Button, bool> m_mouse_button_states;
 	std::unordered_map<sf::Mouse::Button, action> m_mouse_button_actions;
 	std::unordered_map<sf::Mouse::Button, std::function<void(sf::Mouse::Button, action)>> m_mouse_button_events_callbacks;

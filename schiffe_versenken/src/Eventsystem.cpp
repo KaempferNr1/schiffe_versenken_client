@@ -115,7 +115,8 @@ void Eventsystem::handle_updates(sf::RenderWindow& window)
 	}
 
 	m_mouse_offset = { 0,0 };
-
+	m_keys_to_block.clear();
+	m_mouse_buttons_to_block.clear();
 	while (const auto event = window.pollEvent())
 	{
 		ImGui::SFML::ProcessEvent(window, *event);
@@ -139,6 +140,8 @@ void Eventsystem::add_key_listener(sf::Keyboard::Key key)
 
 bool Eventsystem::get_key_state(const sf::Keyboard::Key key) const
 {
+	if (m_keys_to_block.contains(key))
+		return false;
 	const auto data = m_key_states.find(key);
 	if(data == m_key_states.end())
 	{
@@ -152,6 +155,8 @@ bool Eventsystem::get_key_state(const sf::Keyboard::Key key) const
 
 Eventsystem::action Eventsystem::get_key_action(const sf::Keyboard::Key key) const
 {
+	if (m_keys_to_block.contains(key))
+		return action_none;
 	const auto data = m_key_actions.find(key);
 	if (data == m_key_actions.end()) 
 	{
@@ -183,6 +188,8 @@ void Eventsystem::add_mouse_button_listener(sf::Mouse::Button button)
 
 bool Eventsystem::get_mouse_button_state(const sf::Mouse::Button button) const
 {
+	if (m_mouse_buttons_to_block.contains(button))
+		return false;
 	const auto data = m_mouse_button_states.find(button);
 	if (data == m_mouse_button_states.end()) 
 	{
@@ -196,6 +203,8 @@ bool Eventsystem::get_mouse_button_state(const sf::Mouse::Button button) const
 
 Eventsystem::action Eventsystem::get_mouse_button_action(const sf::Mouse::Button button) const
 {
+	if (m_mouse_buttons_to_block.contains(button))
+		return action_none;
 	const auto data = m_mouse_button_actions.find(button);
 	if (data == m_mouse_button_actions.end()) 
 	{

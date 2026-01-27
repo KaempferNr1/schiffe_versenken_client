@@ -31,7 +31,7 @@ public:
 	void on_close() override;
 
 	[[nodiscard]] LayerID get_layer_id() override;
-	void place_ships(int row, int col, int length, int is_horizontal);
+	//void place_ships(int row, int col, int length, int is_horizontal);
 
 private:
 	sf::View m_view;
