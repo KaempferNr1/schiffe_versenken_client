@@ -5,10 +5,7 @@
 #include "Utils/json.hpp"
 #include "Utils/Log.h"
 
-void Ship::render(sf::RenderWindow& window)
-{
-	window.draw(sprite);
-}
+
 
 Client::Client(sf::IpAddress ip, unsigned short port)
 {

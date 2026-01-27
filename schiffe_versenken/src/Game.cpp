@@ -13,105 +13,11 @@
 
 #include "Client.h"
 #include "IdleLayer.h"
+#include "PlacingScreen.h"
 #include "ReconnectScreen.h"
 #include "Utils/json.hpp"
 #include "../Resources/Images/Roboto-Regular.embed"
 
-constexpr sf::Vector2f map_size{342.f,342.f};
-constexpr float padding_between_maps = 20.f;
-constexpr sf::Vector2f cell_size{ 31.f,31.f };
-constexpr sf::Vector2f player_map_offset{50.f,50.f};
-constexpr sf::Vector2f opponent_map_offset{ player_map_offset.x+map_size.x+padding_between_maps,player_map_offset.y};
-
-Ship place_ships(int row, int col, int length, int is_horizontal, std::array<std::array<int8_t, 10>, 10>& ship_map, int ship_index)
-{
-	int amount_of_rows;
-	int amount_of_cols;
-	if (is_horizontal)
-	{
-		amount_of_cols = length;
-		amount_of_rows = 1;
-	}
-	else
-	{
-		amount_of_cols = 1;
-		amount_of_rows = length;
-	}
-	std::vector<std::pair<int, int>> coordinates;
-	for (int offset_in_col = 0; offset_in_col < amount_of_cols; ++offset_in_col)
-	{
-		for (int offset_in_row = 0; offset_in_row < amount_of_rows; ++offset_in_row)
-		{
-			const int current_row = row + offset_in_row;
-			const int current_col = col + offset_in_col;
-			coordinates.emplace_back(current_row, current_col);
-			ship_map[current_row][current_col] = 1 + ship_index;
-		}
-	}
-	sf::RectangleShape sprite;
-	sf::IntRect texture_rect;
-
-	if (is_horizontal)
-	{
-		texture_rect.size = { 32 + 31 * (length - 1),32 };
-	}
-	else
-	{
-		texture_rect.size = { 32,32 + 31 * (length - 1) };
-	}
-	if (length == 2)
-	{
-		if (is_horizontal)
-		{
-			texture_rect.position = { 244, 218 };
-		}
-		else
-		{
-			texture_rect.position = { 0,0 };
-		}
-	}
-	else if (length == 3)
-	{
-		if (is_horizontal)
-		{
-			texture_rect.position = { 244, 256 };
-		}
-		else
-		{
-			texture_rect.position = { 38,0 };
-		}
-	}
-	else if (length == 4)
-	{
-		if (is_horizontal)
-		{
-			texture_rect.position = { 244, 330 };
-		}
-		else
-		{
-			texture_rect.position = { 112,0 };
-		}
-	}
-	else
-	{
-		if (is_horizontal)
-		{
-			texture_rect.position = { 244, 368 };
-		}
-		else
-		{
-			texture_rect.position = { 150,0 };
-		}
-	}
-	
-
-
-
-	sprite.setTextureRect(texture_rect);
-	sprite.setSize(sf::Vector2f(texture_rect.size));
-	sprite.setPosition({ (float)col * cell_size.x + player_map_offset.x + cell_size.x, player_map_offset.y + cell_size.y + (float)row * cell_size.y });
-	return { coordinates, std::move(sprite), length, false };
-}
 
 
 Game::Game(std::shared_ptr<Soundsystem>& soundsystem)
@@ -137,7 +43,7 @@ Game::Game(std::shared_ptr<Soundsystem>& soundsystem)
 	m_server_info = nlohmann::json::parse(f);
 	if (!m_player_background_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "oceangrid_final.png"))LOG_ERROR("Failed to load");
 	if (!m_opponent_background_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "radargrid_final.png"))LOG_ERROR("Failed to load");
-	if (!m_tokens_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "Tokens.png"))LOG_ERROR("Failed to load");
+	if (!m_tokens_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "Tokens 1.png"))LOG_ERROR("Failed to load");
 	if (!m_ship_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "BattleShipSheet_final.png"))LOG_ERROR("Failed to load");
 
 	m_tokens_vertex_array.setPrimitiveType(sf::PrimitiveType::Triangles);
@@ -224,7 +130,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			m_status = status::GAME_DONE;
 			std::vector<std::vector<int8_t>> temp_map = answer["board"];
 			std::array<std::vector<std::pair<int, int>>,5> coordinates;
-			std::array<bool,5> horizontal;
+			int8_t horizontal;
 			for(int i = 0; i < 10; i++)
 			{
 				for(int j = 0; j < 10;j++)
@@ -234,7 +140,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 					{
 						if(!coordinates[cell - 1].empty())
 						{
-							horizontal[cell - 1] = i == coordinates[cell - 1].back().first;
+							horizontal |= (i == coordinates[cell - 1].back().first) << (cell - 1);
 						}
 						coordinates[cell - 1].emplace_back(i, j);
 					}
@@ -244,71 +150,13 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 
 			for (int i = 0; i < coordinates.size();++i)
 			{
-				sf::RectangleShape sprite;
-				sf::IntRect texture_rect;
-				const bool is_horizontal = horizontal[i];
+				const bool is_horizontal = (horizontal >> i) & 1;
 				const int length = coordinates[i].size();
 				if (length == 0)
 					continue;
-				if (is_horizontal)
-				{
-					texture_rect.size = { 32 + 31 * (length - 1),32 };
-				}
-				else
-				{
-					texture_rect.size = { 32,32 + 31 * (length - 1) };
-				}
-				if (length == 2)
-				{
-					if (is_horizontal)
-					{
-						texture_rect.position = { 244, 218 };
-					}
-					else
-					{
-						texture_rect.position = { 0,0 };
-					}
-				}
-				else if (length == 3)
-				{
-					if (is_horizontal)
-					{
-						texture_rect.position = { 244, 256 };
-					}
-					else
-					{
-						texture_rect.position = { 38,0 };
-					}
-				}
-				else if (length == 4)
-				{
-					if (is_horizontal)
-					{
-						texture_rect.position = { 244, 330 };
-					}
-					else
-					{
-						texture_rect.position = { 112,0 };
-					}
-				}
-				else
-				{
-					if (is_horizontal)
-					{
-						texture_rect.position = { 244, 368 };
-					}
-					else
-					{
-						texture_rect.position = { 150,0 };
-					}
-				}
-
-
-
-
-				sprite.setTextureRect(texture_rect);
-				sprite.setSize(sf::Vector2f(texture_rect.size));
-				sprite.setPosition({ (float)coordinates[i].front().second * cell_size.x + opponent_map_offset.x + cell_size.x, +opponent_map_offset.y + cell_size.y + (float)coordinates[i].front().first * cell_size.y });
+				const int row = coordinates[i].front().first;
+				const int col = coordinates[i].front().second;
+				sf::RectangleShape sprite = create_ship_sprite(row, col , length, is_horizontal, opponent_map_offset);
 				sprite.setTexture(&m_ship_texture);
 				m_ships.emplace_back(coordinates[i], std::move(sprite));
 			}
@@ -356,7 +204,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			const int col = answer["col"];
 			const int length = answer["length"];
 			const int is_horizontal = answer["is_horizontal"];
-			m_ships.emplace_back(place_ships(row, col, length, is_horizontal,m_ship_map,m_ships.size())).sprite.setTexture(&m_ship_texture);
+			m_ships.emplace_back(place_ship(row, col, length, is_horizontal,m_ship_map,m_ships.size(),player_map_offset)).sprite.setTexture(&m_ship_texture);
 		}
 	}
 
@@ -425,43 +273,39 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 	else if (m_status == status::PLACING_PHASE)
 	{
 		ImGui::Begin("debug");
-		static int row = 0;
-		static int col = 0;
-		static int length = 2;
-		static bool is_horizontal = false;
 		if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
-			row = (row + 1) % 10;
+			m_row = (m_row + 1) % 10;
 		if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
 			|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
-			row = row - 1 < 0 ? 9 : row - 1;
+			m_row = m_row - 1 < 0 ? 9 : m_row - 1;
 
 		if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
 			|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
-			col = (col + 1) % 10;
+			m_col = (m_col + 1) % 10;
 		if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
 			|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
-			col = col - 1 < 0 ? 9 : col - 1;
+			m_col = m_col - 1 < 0 ? 9 : m_col - 1;
 
 		if (eventsystem->get_key_action(sf::Keyboard::Key::R) == Eventsystem::action_pressed)
-			is_horizontal = !is_horizontal;
+			m_is_horizontal = !m_is_horizontal;
 		if (eventsystem->get_key_action(sf::Keyboard::Key::E) == Eventsystem::action_pressed)
-			length = length + 1 > 5 ? 2 : length + 1;
+			m_length = m_length + 1 > 5 ? 2 : m_length + 1;
 		if (eventsystem->get_key_action(sf::Keyboard::Key::Q) == Eventsystem::action_pressed)
-			length = length - 1 < 2 ? 5 : length - 1;
+			m_length = m_length - 1 < 2 ? 5 : m_length - 1;
 		
-		ImGui::SliderInt("row", &row, 0, 9);
-		ImGui::SliderInt("col", &col, 0, 9);
-		ImGui::SliderInt("length", &length, 2, 5);
-		ImGui::Checkbox("is horizontal", &is_horizontal);
+		ImGui::SliderInt("row", &m_row, 0, 9);
+		ImGui::SliderInt("col", &m_col, 0, 9);
+		ImGui::SliderInt("length", &m_length, 2, 5);
+		ImGui::Checkbox("is horizontal", &m_is_horizontal);
 		if (ImGui::Button("place ship") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
 		{
 			nlohmann::json message;
 			message["type"] = "game";
 			message["kind"] = "place";
-			message["row"] = row;
-			message["col"] = col;
-			message["length"] = length;
-			message["is_horizontal"] = is_horizontal;
+			message["row"] = m_row;
+			message["col"] = m_col;
+			message["length"] = m_length;
+			message["is_horizontal"] = m_is_horizontal;
 			sf::Packet packet;
 			packet << message.dump();
 			m_client->m_packets_to_be_sent.push_back(packet);
@@ -477,32 +321,29 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 	{
 		ImGui::Begin("debug");
 		ImGui::Text("%s", status.c_str());
-		static int row = 0;
-		static int col = 0;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed 
-			|| eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
-			row = (row + 1) % 10;
+		if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
+			m_row = (m_row + 1) % 10;
 		if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
 			|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
-			row = row - 1 < 0 ? 9 : row - 1;
+			m_row = m_row - 1 < 0 ? 9 : m_row - 1;
 
 		if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
 			|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
-			col = (col + 1) % 10;
+			m_col = (m_col + 1) % 10;
 		if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
 			|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
-			col = col - 1 < 0 ? 9 : col - 1;
+			m_col = m_col - 1 < 0 ? 9 : m_col - 1;
 
-		ImGui::SliderInt("row", &row, 0, 9);
-		ImGui::SliderInt("col", &col, 0, 9);
+		ImGui::SliderInt("row", &m_row, 0, 9);
+		ImGui::SliderInt("col", &m_col, 0, 9);
 
 		if (ImGui::Button("shoot") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
 		{
 			nlohmann::json message;
 			message["type"] = "game";
 			message["kind"] = "move";
-			message["row"] = row;
-			message["col"] = col;
+			message["row"] = m_row;
+			message["col"] = m_col;
 			sf::Packet packet;
 			packet << message.dump();
 			m_client->m_packets_to_be_sent.push_back(packet);
@@ -575,11 +416,24 @@ void Game::render(sf::RenderWindow& window)
 		ship.render(window);
 	}
 	if (m_status == status::PLACING_PHASE)
+	{
+
+		sf::RectangleShape selection = create_ship_sprite(m_row, m_col, m_length, m_is_horizontal, player_map_offset);
+		selection.setTexture(&m_ship_texture);
+		window.draw(selection);
 		return;
+	}
 	sf::RenderStates states = sf::RenderStates::Default;
 	states.texture = &m_tokens_texture;
 	window.draw(m_tokens_vertex_array, states);
-
+	
+	if (m_status == status::SHOOTING_PHASE) 
+	{
+		sf::RectangleShape selection{ {32.f,32.f} };
+		selection.setPosition(calculate_position(m_row, m_col, opponent_map_offset));
+		selection.setFillColor({ 127,127,127,127 });
+		window.draw(selection);
+	}
 }
 
 void Game::on_close()

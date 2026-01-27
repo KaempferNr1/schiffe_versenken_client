@@ -45,6 +45,7 @@
     <ClInclude Include="src\IdleLayer.h" />
     <ClInclude Include="src\UI\Slider.h" />
     <ClInclude Include="VersusCom.h" />
+    <ClInclude Include="src\PlacingScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UI\Implementations\Buttons\Button.cpp">
@@ -79,6 +80,7 @@
     <ClCompile Include="src\IdleLayer.cpp" />
     <ClCompile Include="src\UI\Implementations\Slider.cpp" />
     <ClCompile Include="VersusCom.cpp" />
+    <ClCompile Include="src\PlacingScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="server.json" />

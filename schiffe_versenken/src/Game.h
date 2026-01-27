@@ -5,7 +5,9 @@
 
 #include "Client.h"
 
+struct Ship;
 class SkillSelector;
+
 enum class status : uint8_t
 {
 	NO_CONNECTION,
@@ -53,8 +55,10 @@ private:
 	status m_status = status::IDLE;
 	std::array<std::array<int8_t, 10>, 10> m_shots = { {0} };
 	std::array<std::array<int8_t, 10>, 10> m_ship_map = { {0} };
-
-
+	int m_row{0};
+	int m_col{0};
+	int m_length{2};
+	bool m_is_horizontal{false};
 
 	friend class Client;
 };

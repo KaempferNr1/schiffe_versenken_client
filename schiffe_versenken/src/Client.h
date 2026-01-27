@@ -13,17 +13,6 @@
 
 class Game;
 
-struct Ship
-{
-    std::vector<std::pair<int, int>> coordinates;
-    sf::RectangleShape sprite;
-    int segments_left{ 1 };
-    bool destroyed{ false };
-
-    void render(sf::RenderWindow&);
-};
-
-
 class Client
 {
 public:

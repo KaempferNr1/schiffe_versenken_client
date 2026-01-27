@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\PlacingScreen.h" />
     <ClInclude Include="src\UI\Slider.h" />
     <ClInclude Include="src\IdleLayer.h" />
     <ClInclude Include="src\ReconnectScreen.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="VersusCom.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\PlacingScreen.cpp" />
     <ClCompile Include="src\UI\Implementations\Slider.cpp" />
     <ClCompile Include="src\IdleLayer.cpp" />
     <ClCompile Include="src\ReconnectScreen.cpp" />

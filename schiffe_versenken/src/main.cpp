@@ -71,7 +71,7 @@ int Main([[maybe_unused]] const int argc, [[maybe_unused]] char** argv)
     std::shared_ptr<LayerManager> layer_manager = init_layer_manager();
 
 
-	window.setFramerateLimit(0);
+	window.setFramerateLimit(60);
     sf::Clock delta_clock;
 	while (window.isOpen())
     {
