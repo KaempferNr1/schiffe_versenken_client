@@ -109,11 +109,21 @@ std::pair<int, int> Computer::make_move()
 		{
 			if (!m_shots[row][col] && m_probabilities[row][col] != 0.0)
 			{
-				m_probabilities[row][col] = 1;
+				m_probabilities[row][col] = 1.0;
+			}
+			else
+			{
+				m_probabilities[row][col] = 0.0;
 			}
 		}
 	}
 
+	m_probabilities[0][0] = 1000;
+	m_probabilities[0][9] = 1000;
+
+	m_probabilities[9][0] = 1000;
+	m_probabilities[9][9] = 1000;
+	
 	bool foundhit = false;
 	for (int row = 0; row < 10; row++)
 	{
@@ -138,13 +148,13 @@ std::pair<int, int> Computer::make_move()
 		{
 			for (int col = 0; col < 10; col++)
 			{
-				if (m_shots[row][col])
+				if (m_shots[row][col] != 0)
 				{
 					continue;
 				}
-				for (auto& [shiplen, shipleft] : ships)
+				for (const auto& [shiplen, shipsleft] : ships)
 				{
-					if (!shipleft)
+					if (shipsleft <= 0)
 					{
 						continue;
 					}
@@ -200,21 +210,25 @@ std::pair<int, int> Computer::make_move()
 	{
 		for (int col = 0; col < 10; col++)
 		{
-			if (!m_shots[row][col])
+			if (m_shots[row][col] != 0)
 			{
-				if (m_probabilities[row][col] > max_prob)
-				{
-					max_prob = m_probabilities[row][col];
-					tie = false;
-					tie_candidates.clear();
-					highest_candidate = std::make_pair(row, col);
-				}
-				else if (m_probabilities[row][col] == max_prob)
-				{
-					tie = true;
-					tie_candidates.emplace_back(row, col);
-				}
+				continue;
 			}
+			const double probability = m_probabilities[row][col];
+			const double difference = abs(probability - max_prob);
+			if (m_probabilities[row][col] > max_prob)
+			{
+				max_prob = m_probabilities[row][col];
+				tie = false;
+				tie_candidates.clear();
+				highest_candidate = std::make_pair(row, col);
+			}
+			else if (difference < 1e-010)
+			{
+				tie = true;
+				tie_candidates.emplace_back(row, col);
+			}
+			
 		}
 	}
 
@@ -236,7 +250,7 @@ VersusCom::VersusCom()
 	m_computer = std::make_unique<Computer>();
 	if (!m_player_background_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "oceangrid_final.png"))LOG_ERROR("Failed to load");
 	if (!m_opponent_background_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "radargrid_final.png"))LOG_ERROR("Failed to load");
-	if (!m_tokens_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "Tokens 1.png"))LOG_ERROR("Failed to load");
+	if (!m_tokens_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "Tokens 2.png"))LOG_ERROR("Failed to load");
 	if (!m_ship_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "BattleShipSheet_final.png"))LOG_ERROR("Failed to load");
 
 	m_tokens_vertex_array.setPrimitiveType(sf::PrimitiveType::Triangles);
@@ -351,6 +365,12 @@ void VersusCom::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_pt
 						{
 							m_computer->m_ships[cell - 1].destroyed = true;
 							m_computer_ships_remaining--;
+							hit_type = 5;
+							for (auto [row, col] : m_computer->m_ships[cell - 1].coordinates)
+							{
+								m_shots[row][col] = 3;
+								change_token_from_vertex_array(m_tokens_vertex_array, row, col, hit_type - 1, opponent_map_offset + cell_size);
+							}
 						}
 
 					}
@@ -420,6 +440,15 @@ void VersusCom::render(sf::RenderWindow& window)
 	{
 		ship.render(window);
 	}
+
+	if (m_status == status::GAME_DONE)
+	{
+		for (Ship& ship : m_computer->m_ships)
+		{
+			ship.render(window);
+		}
+	}
+
 	if (m_status == status::PLACING_PHASE)
 	{
 
@@ -439,14 +468,9 @@ void VersusCom::render(sf::RenderWindow& window)
 		selection.setPosition(calculate_position(m_row, m_col, opponent_map_offset));
 		selection.setFillColor({ 127,127,127,127 });
 		window.draw(selection);
+
 	}
-	else
-	{
-		for (Ship& ship : m_computer->m_ships)
-		{
-			ship.render(window);
-		}
-	}
+
 }
 
 void VersusCom::on_close()

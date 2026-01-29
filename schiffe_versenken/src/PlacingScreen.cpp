@@ -177,6 +177,28 @@ void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, 
 	vertex_array.append(vertex4);
 }
 
+void change_token_from_vertex_array(sf::VertexArray& vertex_array, int row, int col, int8_t type, sf::Vector2f offset)
+{
+	const sf::Vector2f cell_position{ (float)col * cell_size.x + offset.x ,(float)row * cell_size.y + offset.y };
+	constexpr sf::Vector2f single_sprite_size = { 32.f,32.f };
+	const sf::Vector2f top_left_tex_coord{ (float)type * single_sprite_size.x,0.f };
+	const sf::Vector2f bottom_right_tex_coord = top_left_tex_coord + single_sprite_size;
+
+	for (int i = 0; i < vertex_array.getVertexCount(); i+=6)
+	{
+		if(vertex_array[i].position == cell_position)
+		{
+			vertex_array[i].texCoords = top_left_tex_coord;
+			vertex_array[i+1].texCoords = { bottom_right_tex_coord.x,top_left_tex_coord.y };
+			vertex_array[i+2].texCoords = { top_left_tex_coord.x,bottom_right_tex_coord.y };
+			vertex_array[i+3].texCoords = { bottom_right_tex_coord.x,top_left_tex_coord.y };
+			vertex_array[i+4].texCoords = { top_left_tex_coord.x,bottom_right_tex_coord.y };
+			vertex_array[i+5].texCoords = bottom_right_tex_coord;
+			break;
+		}
+	}
+}
+
 //PlacingScreen::PlacingScreen()
 //{
 //	m_ships_to_place = {1,2,1,1};

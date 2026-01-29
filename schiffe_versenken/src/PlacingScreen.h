@@ -7,7 +7,7 @@
 constexpr sf::Vector2f map_size{ 342.f,342.f };
 constexpr float padding_between_maps = 20.f;
 constexpr sf::Vector2f cell_size{ 31.f,31.f };
-constexpr sf::Vector2f player_map_offset{ 50.f,50.f };
+constexpr sf::Vector2f player_map_offset{ 8.f,8.f };
 constexpr sf::Vector2f opponent_map_offset{ player_map_offset.x + map_size.x + padding_between_maps,player_map_offset.y };
 
 struct Ship
@@ -32,6 +32,7 @@ Ship place_ship(int row, int col, int length, int is_horizontal, std::array<std:
 
 void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, int8_t type, sf::Vector2f offset);
 
+void change_token_from_vertex_array(sf::VertexArray& vertex_array, int row, int col, int8_t type, sf::Vector2f offset);
 
 //class PlacingScreen : public Layer
 //{

@@ -43,7 +43,7 @@ Game::Game([[maybe_unused]] std::shared_ptr<Soundsystem>& soundsystem)
 	m_server_info = nlohmann::json::parse(f);
 	if (!m_player_background_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "oceangrid_final.png"))LOG_ERROR("Failed to load");
 	if (!m_opponent_background_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "radargrid_final.png"))LOG_ERROR("Failed to load");
-	if (!m_tokens_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "Tokens 1.png"))LOG_ERROR("Failed to load");
+	if (!m_tokens_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "Tokens 2.png"))LOG_ERROR("Failed to load");
 	if (!m_ship_texture.loadFromFile(std::filesystem::path("Resources") / "Images" / "Naval Battle Assets" / "BattleShipSheet_final.png"))LOG_ERROR("Failed to load");
 
 	m_tokens_vertex_array.setPrimitiveType(sf::PrimitiveType::Triangles);
@@ -142,12 +142,15 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 
 			if (answer["kind"] != "receive")
 			{
-				status = "enemy turn";
+				status = "enemy turn";	
 
 				const int row = answer["row"];
 				const int col = answer["col"];
 				m_shots[row][col] = answer["kind"] == "miss" ? 1 : 2;
-				add_token_to_vertex_array(m_tokens_vertex_array, row, col, m_shots[row][col] - 1,{opponent_map_offset + cell_size});
+				if (answer["kind"] == "destroyed")
+					add_token_to_vertex_array(m_tokens_vertex_array, row, col, 4, { opponent_map_offset + cell_size });
+				else
+					add_token_to_vertex_array(m_tokens_vertex_array, row, col, m_shots[row][col] - 1,{opponent_map_offset + cell_size});
 			}
 			else
 			{
