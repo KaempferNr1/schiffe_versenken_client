@@ -118,11 +118,6 @@ std::pair<int, int> Computer::make_move()
 		}
 	}
 
-	m_probabilities[0][0] = 1000;
-	m_probabilities[0][9] = 1000;
-
-	m_probabilities[9][0] = 1000;
-	m_probabilities[9][9] = 1000;
 	
 	bool foundhit = false;
 	for (int row = 0; row < 10; row++)
@@ -152,9 +147,9 @@ std::pair<int, int> Computer::make_move()
 				{
 					continue;
 				}
-				for (const auto& [shiplen, shipsleft] : ships)
+				for (const auto& [shiplen, amount_ships_left] : ships)
 				{
-					if (shipsleft <= 0)
+					if (amount_ships_left <= 0)
 					{
 						continue;
 					}
@@ -285,33 +280,7 @@ void VersusCom::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_pt
 	}
 	else if (m_status == status::PLACING_PHASE)
 	{
-		ImGui::Begin("debug");
-
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
-			m_row = (m_row + 1) % 10;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
-			m_row = m_row - 1 < 0 ? 9 : m_row - 1;
-
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
-			m_col = (m_col + 1) % 10;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
-			m_col = m_col - 1 < 0 ? 9 : m_col - 1;
-
-		if (eventsystem->get_key_action(sf::Keyboard::Key::R) == Eventsystem::action_pressed)
-			m_is_horizontal = !m_is_horizontal;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::E) == Eventsystem::action_pressed)
-			m_length = m_length + 1 > 5 ? 2 : m_length + 1;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Q) == Eventsystem::action_pressed)
-			m_length = m_length - 1 < 2 ? 5 : m_length - 1;
-
-		ImGui::SliderInt("row", &m_row, 0, 9);
-		ImGui::SliderInt("col", &m_col, 0, 9);
-		ImGui::SliderInt("length", &m_length, 2, 5);
-		ImGui::Checkbox("is horizontal", &m_is_horizontal);
-		if (ImGui::Button("place ship") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
+		if (place_ship_screen(eventsystem,m_row,m_col,m_is_horizontal,m_length))
 		{
 			if (validplacement(m_row,m_col,m_length,m_is_horizontal,m_ship_map) && !(m_length < 2 || m_length > 5) && ships_left[m_length - 2] > 0)
 			{
@@ -320,7 +289,6 @@ void VersusCom::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_pt
 			}
 		}
 
-		ImGui::End();
 		if (m_ships.size() == 5)
 		{
 			m_status = status::SHOOTING_PHASE;
@@ -328,24 +296,7 @@ void VersusCom::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_pt
 	}
 	else
 	{
-		ImGui::Begin("debug");
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
-			m_row = (m_row + 1) % 10;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
-			m_row = m_row - 1 < 0 ? 9 : m_row - 1;
-
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
-			m_col = (m_col + 1) % 10;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
-			m_col = m_col - 1 < 0 ? 9 : m_col - 1;
-
-		ImGui::SliderInt("row", &m_row, 0, 9);
-		ImGui::SliderInt("col", &m_col, 0, 9);
-
-		if (ImGui::Button("shoot") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
+		if (shoot_screen(eventsystem,m_row,m_col))
 		{
 			while ((!(m_col < 0 || m_col > 9) && !(m_row < 0 || m_row > 9)))
 			{
@@ -410,8 +361,6 @@ void VersusCom::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_pt
 			m_status = status::GAME_DONE;
 
 		}
-
-		ImGui::End();
 	}
 
 	if (eventsystem->get_key_action(sf::Keyboard::Key::Escape) == Eventsystem::action_pressed)

@@ -62,12 +62,14 @@ Game::~Game()
 void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<LayerManager>& layer_manager, std::shared_ptr<Soundsystem>& soundsystem, sf::RenderWindow& window, const double deltatime)
 {
 	static std::string status;
+	
 	if (!m_client)
 	{
 		m_client = std::make_shared<Client>(sf::IpAddress::resolve(m_server_info["ip"]).value_or(sf::IpAddress::LocalHost), m_server_info["port"]);
 		m_status = m_client->is_connected() ? status::IDLE : status::NO_CONNECTION;
 		LOG_INFO("client connected: {}", m_client->is_connected());
 	}
+
 	nlohmann::json answer = m_client->update();
 
 	if (!answer.empty())
@@ -119,10 +121,8 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 						}
 						coordinates[cell - 1].emplace_back(i, j);
 					}
-
 				}
 			}
-
 			for (int i = 0; i < coordinates.size();++i)
 			{
 				const bool is_horizontal = (horizontal >> i) & 1;
@@ -138,8 +138,6 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 		}
 		else if (type == "shot")
 		{
-			
-
 			if (answer["kind"] != "receive")
 			{
 				status = "enemy turn";	
@@ -159,7 +157,6 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 				const int row = answer["row"];
 				const int col = answer["col"];
 				int8_t& cell = m_ship_map[row][col];
-
 				if (cell > 0)
 				{
 					if (--m_ships[cell - 1].segments_left == 0)
@@ -185,7 +182,6 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			m_ships.emplace_back(place_ship(row, col, length, is_horizontal,m_ship_map,static_cast<int>(m_ships.size()),player_map_offset)).sprite.setTexture(&m_ship_texture);
 		}
 	}
-
 
 	if (!m_client->is_connected() && m_status != status::RECONNECT_SCREEN && m_status != status::GAME_DONE)
 	{
@@ -250,32 +246,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 	}
 	else if (m_status == status::PLACING_PHASE)
 	{
-		ImGui::Begin("debug");
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
-			m_row = (m_row + 1) % 10;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
-			m_row = m_row - 1 < 0 ? 9 : m_row - 1;
-
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
-			m_col = (m_col + 1) % 10;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
-			m_col = m_col - 1 < 0 ? 9 : m_col - 1;
-
-		if (eventsystem->get_key_action(sf::Keyboard::Key::R) == Eventsystem::action_pressed)
-			m_is_horizontal = !m_is_horizontal;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::E) == Eventsystem::action_pressed)
-			m_length = m_length + 1 > 5 ? 2 : m_length + 1;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Q) == Eventsystem::action_pressed)
-			m_length = m_length - 1 < 2 ? 5 : m_length - 1;
-		
-		ImGui::SliderInt("row", &m_row, 0, 9);
-		ImGui::SliderInt("col", &m_col, 0, 9);
-		ImGui::SliderInt("length", &m_length, 2, 5);
-		ImGui::Checkbox("is horizontal", &m_is_horizontal);
-		if (ImGui::Button("place ship") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
+		if (place_ship_screen(eventsystem,m_row,m_col, m_is_horizontal,m_length))
 		{
 			nlohmann::json message;
 			message["type"] = "game";
@@ -288,34 +259,14 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			packet << message.dump();
 			m_client->m_packets_to_be_sent.push_back(packet);
 		}
-		//ImGui::Text("Ship board");
-		//for (int i = 0; i < 10; ++i)
-		//{
-		//	ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_ship_map[i][0], m_ship_map[i][1], m_ship_map[i][2], m_ship_map[i][3], m_ship_map[i][4], m_ship_map[i][5], m_ship_map[i][6], m_ship_map[i][7], m_ship_map[i][8], m_ship_map[i][9]);
-		//}
-		ImGui::End();
 	}
 	else
 	{
 		ImGui::Begin("debug");
 		ImGui::Text("%s", status.c_str());
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
-			m_row = (m_row + 1) % 10;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
-			m_row = m_row - 1 < 0 ? 9 : m_row - 1;
-
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
-			m_col = (m_col + 1) % 10;
-		if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
-			|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
-			m_col = m_col - 1 < 0 ? 9 : m_col - 1;
-
-		ImGui::SliderInt("row", &m_row, 0, 9);
-		ImGui::SliderInt("col", &m_col, 0, 9);
-
-		if (ImGui::Button("shoot") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
+		ImGui::End();
+		
+		if (shoot_screen(eventsystem,m_row,m_col))
 		{
 			nlohmann::json message;
 			message["type"] = "game";
@@ -326,22 +277,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 			packet << message.dump();
 			m_client->m_packets_to_be_sent.push_back(packet);
 		}
-		//ImGui::Text("Ship board");
-		//for (int i = 0; i < 10; ++i)
-		//{
-		//	ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_ship_map[i][0], m_ship_map[i][1], m_ship_map[i][2], m_ship_map[i][3], m_ship_map[i][4], m_ship_map[i][5], m_ship_map[i][6], m_ship_map[i][7], m_ship_map[i][8], m_ship_map[i][9]);
-		//}
-
-		//ImGui::Text("hit board");
-		//for (int i = 0; i < 10; ++i)
-		//{
-		//	ImGui::Text("%d %d %d %d %d %d %d %d %d %d", m_shots[i][0], m_shots[i][1], m_shots[i][2], m_shots[i][3], m_shots[i][4], m_shots[i][5], m_shots[i][6], m_shots[i][7], m_shots[i][8], m_shots[i][9]);
-		//}
-
-		ImGui::End();
-
 	}
-
 
 	if (!m_layer_manager->is_empty())
 	{
@@ -352,12 +288,6 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 	{
 		m_current_layer.reset();
 	}
-
-
-
-
-
-
 
 	if (this == layer_manager->get_top().get() && (eventsystem->get_key_action(sf::Keyboard::Key::Escape) == Eventsystem::action_pressed /*|| !eventsystem->has_focus()*/))
 	{

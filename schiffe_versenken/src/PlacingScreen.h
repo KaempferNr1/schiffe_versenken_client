@@ -34,6 +34,11 @@ void add_token_to_vertex_array(sf::VertexArray& vertex_array, int row, int col, 
 
 void change_token_from_vertex_array(sf::VertexArray& vertex_array, int row, int col, int8_t type, sf::Vector2f offset);
 
+bool place_ship_screen(const std::shared_ptr<Eventsystem>& eventsystem, int& row, int& col, bool& is_horizontal, int& length);
+
+bool shoot_screen(const std::shared_ptr<Eventsystem>& eventsystem, int& row, int& col);
+
+
 //class PlacingScreen : public Layer
 //{
 //private:

@@ -199,6 +199,76 @@ void change_token_from_vertex_array(sf::VertexArray& vertex_array, int row, int 
 	}
 }
 
+bool place_ship_screen(const std::shared_ptr<Eventsystem>& eventsystem, int& row, int& col, bool& is_horizontal, int& length)
+{
+	ImGui::Begin("debug");
+
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
+		row = (row + 1) % 10;
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
+		|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
+		row = (row + 9) % 10;
+
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
+		|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
+		col = (col + 1) % 10;
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
+		|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
+		col = (col + 9) % 10;
+
+	if (eventsystem->get_key_action(sf::Keyboard::Key::R) == Eventsystem::action_pressed)
+		is_horizontal = !is_horizontal;
+	if (eventsystem->get_key_action(sf::Keyboard::Key::E) == Eventsystem::action_pressed)
+		length = 2 + ((length + 3) % 4);
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Q) == Eventsystem::action_pressed)
+		length = 2 + ((length + 1) % 4);
+	
+
+	ImGui::SliderInt("row", &row, 0, 9);
+	ImGui::SliderInt("col", &col, 0, 9);
+	ImGui::SliderInt("length", &length, 2, 5);
+	ImGui::Checkbox("is horizontal", &is_horizontal);
+	bool should_place_ship = false;
+	if (ImGui::Button("place ship") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
+	{
+		should_place_ship = true;
+	}
+
+	ImGui::End();
+	return should_place_ship;
+}
+
+bool shoot_screen(const std::shared_ptr<Eventsystem>& eventsystem, int& row, int& col)
+{
+	ImGui::Begin("debug");
+
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Down) == Eventsystem::action_pressed || eventsystem->get_key_action(sf::Keyboard::Key::S) == Eventsystem::action_pressed)
+		row = (row + 1) % 10;
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Up) == Eventsystem::action_pressed
+		|| eventsystem->get_key_action(sf::Keyboard::Key::W) == Eventsystem::action_pressed)
+		row = (row + 9) % 10;
+
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Right) == Eventsystem::action_pressed
+		|| eventsystem->get_key_action(sf::Keyboard::Key::D) == Eventsystem::action_pressed)
+		col = (col + 1) % 10;
+	if (eventsystem->get_key_action(sf::Keyboard::Key::Left) == Eventsystem::action_pressed
+		|| eventsystem->get_key_action(sf::Keyboard::Key::A) == Eventsystem::action_pressed)
+		col = (col + 9) % 10;
+	
+	ImGui::SliderInt("row", &row, 0, 9);
+	ImGui::SliderInt("col", &col, 0, 9);
+
+	bool should_shoot = false;
+	if (ImGui::Button("shoot") || eventsystem->get_key_action(sf::Keyboard::Key::Enter) == Eventsystem::action_pressed)
+	{
+		should_shoot = true;
+	}
+
+	ImGui::End();
+	return should_shoot;
+}
+
+
 //PlacingScreen::PlacingScreen()
 //{
 //	m_ships_to_place = {1,2,1,1};
