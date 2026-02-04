@@ -21,13 +21,13 @@
 
 static int Main(int argc, char** argv);
 
-static [[nodiscard]] bool init_sfml_imgui(sf::RenderWindow& window);
+[[nodiscard]] static bool init_sfml_imgui(sf::RenderWindow& window);
 
-static [[nodiscard]] std::shared_ptr<Eventsystem> init_eventsystem(sf::RenderWindow& window);
+[[nodiscard]] static std::shared_ptr<Eventsystem> init_eventsystem(sf::RenderWindow& window);
 
-static [[nodiscard]] std::shared_ptr<LayerManager> init_layer_manager();
+[[nodiscard]] static std::shared_ptr<LayerManager> init_layer_manager();
 
-static [[nodiscard]] std::shared_ptr<Soundsystem> init_soundsystem();
+[[nodiscard]] static std::shared_ptr<Soundsystem> init_soundsystem();
 
 static void save_volumes(const std::shared_ptr<Soundsystem>& soundsystem);
 

@@ -1,3 +1,5 @@
+WINDOWS = os.host() == "windows"
+
 project "ImGui"
 	kind "StaticLib"
 	language "C++"
@@ -24,79 +26,94 @@ project "ImGui"
 		"imconfig-SFML.h",
 		"imgui-SFML_export.h"
 	}
-	defines {"SFML_STATIC"}
  
-	libdirs { "../SFML/SFML-3.0.0/lib" }
-
-	 links
-	 {
-		"freetype",
-		"winmm",
-		"gdi32",
-        --"flac",
-		"vorbisenc",
-		"vorbisfile",
-		"vorbis",
-		"ogg",
-		"ws2_32",
-        "legacy_stdio_definitions" --falls was schiefgeht einfach wieder reinmachen
-	 }
+	links
+	{
+	"freetype",
+	"winmm",
+	"gdi32",
+       --"flac",
+	"vorbisenc",
+	"vorbisfile",
+	"vorbis",
+	"ogg",
+	"ws2_32",
+    "legacy_stdio_definitions" --falls was schiefgeht einfach wieder reinmachen
+	}
 	includedirs
 	{
 	 "../glm",
 	 "../SFML/SFML-3.0.0/include"
 	}
 
+    filter "action:vs*"
+        buildoptions { "/Zc:__cplusplus" }
+
 	filter "system:windows"
 		systemversion "latest"
 		cppdialect "C++20"
+        libdirs { "../SFML/SFML-3.0.0/lib" }
         links
         {
         		"opengl32",
         }
+        defines {"SFML_STATIC"}
+
 
 	filter "system:linux"
 		pic "On"
 		systemversion "latest"
-		cppdialect "C++17"
+		cppdialect "C++20"
         links
         {
-            "GL"
+            "GL",
+            "sfml-graphics",
+			"sfml-window",
+			"sfml-system",
+			"sfml-audio",
+			"sfml-network"
         }
 
-	filter "configurations:Debug"
-		runtime "Debug"
-		symbols "on"
-		links
-		{	
-			"sfml-graphics-s-d",
-			"sfml-window-s-d",
-			"sfml-system-s-d",
-            "sfml-audio-s-d",
-			"sfml-network-s-d"
-		}
+   filter "configurations:Release"
+      defines { "RELEASE" }
+      if WINDOWS then
+        links
+        {	
+          "FLAC",
+          "freetype",
+          "ogg",
+          "vorbisenc",
+		  "vorbisfile",
+		  "vorbis",
+          "sfml-graphics-s",
+          "sfml-window-s",
+          "sfml-system-s",
+          "sfml-audio-s",
+          "sfml-network-s",
+        }
+      end  
+      runtime "Release"
+      optimize "On"
+      symbols "On"
 
-	filter "configurations:Release"
-		runtime "Release"
-		optimize "on"
-		links
-		{	
-			"sfml-graphics-s",
-			"sfml-window-s",
-			"sfml-system-s",
-			"sfml-audio-s",
-			"sfml-network-s"
-		}
-
-    filter "configurations:Dist"
-		runtime "Release"
-		optimize "on"
-        symbols "off"
-		links
-		{	
-			"sfml-graphics-s",
-			"sfml-window-s",
-			"sfml-system-s",
-            "sfml-audio-s",
-			"sfml-network-s"
-		}
+   filter "configurations:Dist"
+      defines { "DIST" }
+      if WINDOWS then
+        links
+        {
+          "FLAC",
+          "freetype",
+          "ogg",
+          "vorbisenc",
+		  "vorbisfile",
+		  "vorbis",
+          "sfml-graphics-s",
+          "sfml-window-s",
+          "sfml-system-s",
+          "sfml-audio-s",
+          "sfml-network-s"
+        }
+      end
+      runtime "Release"
+      optimize "On"
+      symbols "Off"

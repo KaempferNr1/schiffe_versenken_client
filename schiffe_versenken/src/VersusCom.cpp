@@ -223,12 +223,10 @@ std::pair<int, int> Computer::make_move()
 				tie = true;
 				tie_candidates.emplace_back(row, col);
 			}
-			
 		}
 	}
 
 	if (tie) {
-		std::uniform_int_distribution distro(0, static_cast<int>(tie_candidates.size()) - 1);
 		const std::pair<int, int> res = tie_candidates[Random::uint(0, static_cast<uint32_t>(tie_candidates.size()) - 1)];
 		next_row = res.first;
 		next_col = res.second;

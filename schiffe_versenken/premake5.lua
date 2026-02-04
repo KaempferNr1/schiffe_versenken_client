@@ -14,12 +14,9 @@ project "schiffe_versenken"
    {
     "../%{IncludeDir.glm}",
     "../%{IncludeDir.spd_log}",
-    "../%{IncludeDir.SFML}",
     "../%{IncludeDir.ImGui}",
     "src"
    }
-   defines {"SFML_STATIC"}
- 
    libdirs { "../vendor/SFML/SFML-3.0.0/lib" }
 
     links
@@ -40,7 +37,10 @@ project "schiffe_versenken"
 
    filter "system:windows"
       systemversion "latest"
-      defines { "PLATFORM_WINDOWS","_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING" }
+      defines { "PLATFORM_WINDOWS","_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING"}
+      libdirs{"../%{IncludeDir.SFML}"}
+      defines { "SFML_STATIC" }
+
       links
       {
           "opengl32",
@@ -51,10 +51,10 @@ project "schiffe_versenken"
           "stdc++fs",
           "GL",
           "sfml-graphics",
+          "sfml-audio",
+          "sfml-network",
           "sfml-window",
           "sfml-system",
-          "sfml-audio",
-          "sfml-network"
         }
 
    filter "configurations:Debug"

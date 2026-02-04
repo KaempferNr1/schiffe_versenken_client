@@ -6,7 +6,13 @@
 #include "Utils/Log.h"
 #include "Utils/Soundsystem.h"
 #include "imgui.h"
+#if !defined(__GNUC__) || __GNUC__ >=  13 
 #include <format>
+using std::format;
+#else
+#define format(...)         fmt::v10::format(__VA_ARGS__)
+#endif 
+
 
 OptionsMenu::OptionsMenu(const std::shared_ptr<Soundsystem>& soundsystem)
 {
@@ -126,10 +132,10 @@ void OptionsMenu::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_
 		Button::small_button_size.x + Button::medium_button_size.x + padding_x * 2};
 	const float start_x = (static_cast<float>(eventsystem->get_window_size().x) - total_width) / 2.f;
 
-	m_buttons[4]->set_data(std::format("global: {:03.0f}", soundsystem->get_volumes().at("global")));
-	m_buttons[8]->set_data(std::format("music: {:03.0f}", soundsystem->get_volumes().at("music")));
-	m_buttons[12]->set_data(std::format("ui: {:03.0f}", soundsystem->get_volumes().at("ui_sounds")));
-	m_buttons[16]->set_data(std::format("player: {:03.0f}", soundsystem->get_volumes().at("game_sounds")));
+	m_buttons[4]->set_data(format("global: {:03.0f}", soundsystem->get_volumes().at("global")));
+	m_buttons[8]->set_data(format("music: {:03.0f}", soundsystem->get_volumes().at("music")));
+	m_buttons[12]->set_data(format("ui: {:03.0f}", soundsystem->get_volumes().at("ui_sounds")));
+	m_buttons[16]->set_data(format("player: {:03.0f}", soundsystem->get_volumes().at("game_sounds")));
 	for (uint8_t i = 0; i < m_buttons.size(); i++)
 	{
 
