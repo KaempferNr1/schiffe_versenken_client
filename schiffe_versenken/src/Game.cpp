@@ -65,7 +65,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 	
 	if (!m_client)
 	{
-		m_client = std::make_shared<Client>(sf::IpAddress::resolve(m_server_info["ip"]).value_or(sf::IpAddress::LocalHost), m_server_info["port"]);
+		m_client = std::make_shared<Client>(sf::IpAddress::resolve(m_server_info["ip"].get<std::string_view>()).value_or(sf::IpAddress::LocalHost), m_server_info["port"]);
 		m_status = m_client->is_connected() ? status::IDLE : status::NO_CONNECTION;
 		LOG_INFO("client connected: {}", m_client->is_connected());
 	}
@@ -186,7 +186,7 @@ void Game::update(std::shared_ptr<Eventsystem>& eventsystem, std::shared_ptr<Lay
 	if (!m_client->is_connected() && m_status != status::RECONNECT_SCREEN && m_status != status::GAME_DONE)
 	{
 		m_layer_manager->clear();
-		m_layer_manager->push_layer(std::make_shared<ReconnectScreen>(m_client, sf::IpAddress::resolve(m_server_info["ip"]).value_or(sf::IpAddress::LocalHost), m_server_info["port"]));
+		m_layer_manager->push_layer(std::make_shared<ReconnectScreen>(m_client, sf::IpAddress::resolve(m_server_info["ip"].get<std::string_view>()).value_or(sf::IpAddress::LocalHost), m_server_info["port"]));
 		m_status = status::RECONNECT_SCREEN;
 	}
 	else if (m_status == status::RECONNECT_SCREEN)

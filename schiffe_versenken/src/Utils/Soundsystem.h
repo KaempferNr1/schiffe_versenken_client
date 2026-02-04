@@ -5,6 +5,8 @@
 #include <optional>
 #include <unordered_map>
 #include <SFML/Audio.hpp>
+#include <thread>
+#include <condition_variable>
 
 class Soundsystem
 {

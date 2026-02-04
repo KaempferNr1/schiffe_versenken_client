@@ -77,7 +77,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>SFML_STATIC;PLATFORM_WINDOWS;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\vendor\glm;..\vendor\spdlog\include;..\vendor\SFML\SFML-3.0.0\include;..\vendor\imgui;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -97,7 +97,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>SFML_STATIC;PLATFORM_WINDOWS;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\vendor\glm;..\vendor\spdlog\include;..\vendor\SFML\SFML-3.0.0\include;..\vendor\imgui;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -123,7 +123,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>SFML_STATIC;PLATFORM_WINDOWS;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\vendor\glm;..\vendor\spdlog\include;..\vendor\SFML\SFML-3.0.0\include;..\vendor\imgui;src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -147,60 +147,57 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\PlacingScreen.h" />
-    <ClInclude Include="src\UI\Slider.h" />
-    <ClInclude Include="src\IdleLayer.h" />
-    <ClInclude Include="src\ReconnectScreen.h" />
     <ClInclude Include="src\Client.h" />
-    <ClInclude Include="src\UI\Button.h" />
-    <ClInclude Include="src\UI\Implementations\Buttons\ButtonBehaviour.h" />
-    <ClInclude Include="src\UI\Implementations\Buttons\ButtonLayout.h" />
     <ClInclude Include="src\Eventsystem.h" />
     <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\IdleLayer.h" />
     <ClInclude Include="src\Layer.h" />
     <ClInclude Include="src\LayerManager.h" />
     <ClInclude Include="src\LevelSelector.h" />
     <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\OptionsMenu.h" />
     <ClInclude Include="src\PauseMenu.h" />
-    <ClInclude Include="src\Utils\json.hpp" />
-    <ClInclude Include="src\Utils\json_fwd.hpp" />
+    <ClInclude Include="src\PlacingScreen.h" />
+    <ClInclude Include="src\ReconnectScreen.h" />
+    <ClInclude Include="src\UI\Button.h" />
+    <ClInclude Include="src\UI\Implementations\Buttons\ButtonBehaviour.h" />
+    <ClInclude Include="src\UI\Implementations\Buttons\ButtonLayout.h" />
+    <ClInclude Include="src\UI\Slider.h" />
     <ClInclude Include="src\Utils\Log.h" />
     <ClInclude Include="src\Utils\Random.h" />
     <ClInclude Include="src\Utils\Soundsystem.h" />
     <ClInclude Include="src\Utils\Timer.h" />
+    <ClInclude Include="src\Utils\json.hpp" />
+    <ClInclude Include="src\Utils\json_fwd.hpp" />
     <ClInclude Include="src\VersusCom.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\PlacingScreen.cpp" />
-    <ClCompile Include="src\UI\Implementations\Slider.cpp" />
-    <ClCompile Include="src\IdleLayer.cpp" />
-    <ClCompile Include="src\ReconnectScreen.cpp" />
     <ClCompile Include="src\Client.cpp" />
-    <ClCompile Include="src\UI\Implementations\Buttons\Button.cpp" />
-    <ClCompile Include="src\UI\Implementations\Buttons\ButtonBehaviour.cpp" />
-    <ClCompile Include="src\UI\Implementations\Buttons\ButtonLayout.cpp" />
     <ClCompile Include="src\Eventsystem.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\IdleLayer.cpp" />
     <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\LayerManager.cpp" />
     <ClCompile Include="src\LevelSelector.cpp" />
     <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\OptionsMenu.cpp" />
     <ClCompile Include="src\PauseMenu.cpp" />
+    <ClCompile Include="src\PlacingScreen.cpp" />
+    <ClCompile Include="src\ReconnectScreen.cpp" />
+    <ClCompile Include="src\UI\Implementations\Buttons\Button.cpp" />
+    <ClCompile Include="src\UI\Implementations\Buttons\ButtonBehaviour.cpp" />
+    <ClCompile Include="src\UI\Implementations\Buttons\ButtonLayout.cpp" />
+    <ClCompile Include="src\UI\Implementations\Slider.cpp" />
     <ClCompile Include="src\Utils\Log.cpp" />
     <ClCompile Include="src\Utils\Random.cpp" />
     <ClCompile Include="src\Utils\Soundsystem.cpp" />
-    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\VersusCom.cpp" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Vendor\imgui\ImGui.vcxproj">
       <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="server.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

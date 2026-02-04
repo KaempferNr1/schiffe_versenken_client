@@ -1,31 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Buttons">
-      <UniqueIdentifier>{F475A3F5-6055-2291-696D-AD67D5CB88F2}</UniqueIdentifier>
+    <Filter Include="UI">
+      <UniqueIdentifier>{83755900-6F01-880B-D8AF-880BC45A880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Implementations">
+      <UniqueIdentifier>{0B50664F-F733-27A5-6094-21F84C971127}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Implementations\Buttons">
+      <UniqueIdentifier>{E918098C-D528-B55C-3EE2-197B2A11A4F5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utils">
       <UniqueIdentifier>{F68B420E-62A0-6ABF-2B22-0E1F97F566F0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\UI\Button.h">
-      <Filter>Buttons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UI\Implementations\Buttons\ButtonBehaviour.h">
-      <Filter>Buttons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UI\Implementations\Buttons\ButtonLayout.h">
-      <Filter>Buttons</Filter>
-    </ClInclude>
+    <ClInclude Include="src\Client.h" />
     <ClInclude Include="src\Eventsystem.h" />
     <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\IdleLayer.h" />
     <ClInclude Include="src\Layer.h" />
     <ClInclude Include="src\LayerManager.h" />
     <ClInclude Include="src\LevelSelector.h" />
     <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\OptionsMenu.h" />
     <ClInclude Include="src\PauseMenu.h" />
+    <ClInclude Include="src\PlacingScreen.h" />
+    <ClInclude Include="src\ReconnectScreen.h" />
+    <ClInclude Include="src\UI\Button.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Implementations\Buttons\ButtonBehaviour.h">
+      <Filter>UI\Implementations\Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Implementations\Buttons\ButtonLayout.h">
+      <Filter>UI\Implementations\Buttons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Slider.h">
+      <Filter>UI</Filter>
+    </ClInclude>
     <ClInclude Include="src\Utils\Log.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -38,33 +51,39 @@
     <ClInclude Include="src\Utils\Timer.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\Client.h" />
-    <ClInclude Include="src\Utils\json.hpp" />
-    <ClInclude Include="src\Utils\json_fwd.hpp" />
-    <ClInclude Include="src\ReconnectScreen.h" />
-    <ClInclude Include="src\IdleLayer.h" />
-    <ClInclude Include="src\UI\Slider.h" />
+    <ClInclude Include="src\Utils\json.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\json_fwd.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
     <ClInclude Include="src\VersusCom.h" />
-    <ClInclude Include="src\PlacingScreen.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\UI\Implementations\Buttons\Button.cpp">
-      <Filter>Buttons</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UI\Implementations\Buttons\ButtonBehaviour.cpp">
-      <Filter>Buttons</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UI\Implementations\Buttons\ButtonLayout.cpp">
-      <Filter>Buttons</Filter>
-    </ClCompile>
+    <ClCompile Include="src\Client.cpp" />
     <ClCompile Include="src\Eventsystem.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\IdleLayer.cpp" />
     <ClCompile Include="src\Layer.cpp" />
     <ClCompile Include="src\LayerManager.cpp" />
     <ClCompile Include="src\LevelSelector.cpp" />
     <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\OptionsMenu.cpp" />
     <ClCompile Include="src\PauseMenu.cpp" />
+    <ClCompile Include="src\PlacingScreen.cpp" />
+    <ClCompile Include="src\ReconnectScreen.cpp" />
+    <ClCompile Include="src\UI\Implementations\Buttons\Button.cpp">
+      <Filter>UI\Implementations\Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Implementations\Buttons\ButtonBehaviour.cpp">
+      <Filter>UI\Implementations\Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Implementations\Buttons\ButtonLayout.cpp">
+      <Filter>UI\Implementations\Buttons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Implementations\Slider.cpp">
+      <Filter>UI\Implementations</Filter>
+    </ClCompile>
     <ClCompile Include="src\Utils\Log.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -74,15 +93,7 @@
     <ClCompile Include="src\Utils\Soundsystem.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Client.cpp" />
-    <ClCompile Include="src\ReconnectScreen.cpp" />
-    <ClCompile Include="src\IdleLayer.cpp" />
-    <ClCompile Include="src\UI\Implementations\Slider.cpp" />
     <ClCompile Include="src\VersusCom.cpp" />
-    <ClCompile Include="src\PlacingScreen.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="server.json" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
 </Project>
